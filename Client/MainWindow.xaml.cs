@@ -1,9 +1,11 @@
-﻿using System;
+﻿using CommonLibrary;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,55 +24,34 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private TcpClient _client;
-        private NetworkStream _stream;
-
+        private ChatClient _chatClient;
+        
         public MainWindow()
         {
             InitializeComponent();
-            ConnectToServer();
+			_chatClient = new ChatClient("127.0.0.1", 12345);
+
         }
 
-        private void ConnectToServer()
-        {
-            try
-            {
-                _client = new TcpClient("127.0.0.1", 12345);
-                _stream = _client.GetStream();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error connecting to the server: " + ex.Message);
-            }
-        }
+        private ChatUser Me { get; set; }
+
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            // Отримайте дані авторизації з текстових полів
-            string login = usernameTextBox.Text;
-            string password = passwordBox.Password;
+            var me = _chatClient.Login(usernameTextBox.Text, passwordBox.Password);
 
-            // Відправте дані авторизації на сервер
-            byte[] data = Encoding.ASCII.GetBytes($"LOGIN|{login}|{password}");
-            _stream.Write(data, 0, data.Length);
+			if (me is ChatUser) {
+                Me = me;
+				// Переключіться на UI чату
+				loginPanel.Visibility = Visibility.Collapsed;
+				userListView.Visibility = Visibility.Visible;
 
-            // Очікуйте відповіді сервера
-            data = new byte[1024];
-            int bytesRead = _stream.Read(data, 0, data.Length);
-            string response = Encoding.ASCII.GetString(data, 0, bytesRead);
+				// Завантажте список користувачів
+				//LoadUserList(); //TODO refactor
+			} else
 
-            if (response == "AUTHENTICATED")
             {
-                // Переключіться на UI чату
-                loginPanel.Visibility = Visibility.Collapsed;
-                userListView.Visibility = Visibility.Visible;
-
-                // Завантажте список користувачів
-                LoadUserList();
-            }
-            else
-            {
-                MessageBox.Show("Authentication failed.");
-            }
+				MessageBox.Show("Authentication failed.");
+			}
         }
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
@@ -79,8 +60,8 @@ namespace Client
             string message = messageTextBox.Text;
 
             // Відправте повідомлення на сервер
-            byte[] data = Encoding.ASCII.GetBytes($"SEND|{message}");
-            _stream.Write(data, 0, data.Length);
+            byte[] data = Encoding.UTF8.GetBytes($"SEND|{message}");
+            //_stream.Write(data, 0, data.Length);
 
             // Очистіть поле введення повідомлення
             messageTextBox.Text = string.Empty;
@@ -115,13 +96,13 @@ namespace Client
                 NetworkStream stream = client.GetStream();
 
                 // Відправте запит на отримання списку користувачів
-                byte[] data = Encoding.ASCII.GetBytes("GET_USERS");
+                byte[] data = Encoding.UTF8.GetBytes("GET_USERS");
                 stream.Write(data, 0, data.Length);
 
                 // Отримайте відповідь від сервера
                 data = new byte[1024];
                 int bytesRead = stream.Read(data, 0, data.Length);
-                string response = Encoding.ASCII.GetString(data, 0, bytesRead);
+                string response = Encoding.UTF8.GetString(data, 0, bytesRead);
 
                 // Розібрати отриману відповідь і додати користувачів до списку
                 if (!string.IsNullOrEmpty(response))

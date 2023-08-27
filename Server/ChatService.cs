@@ -17,10 +17,12 @@ namespace Server
             _context = new ServerContext();
         }
 
-        public bool Authenticate(string login, string password)
+        public User? Authenticate(string login, string password)
         {
+            Console.WriteLine("Try auth: {0} {1}", login, password);
             var user = _context.Users.FirstOrDefault(u => u.Login == login && u.Password == password);
-            return user != null;
+
+            return user;
         }
 
         public List<User> GetUsers()

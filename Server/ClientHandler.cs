@@ -48,34 +48,38 @@ namespace Server
 					{
 						HandleLogin(JsonSerializer.Deserialize<LoginData>(wrapper.Content));
 					}
+                    else if (wrapper.Type == DataType.GetUsers)
+                    {
+                        SendUserList();
+                    }
 
 
 
-					// Обробка різних дій в залежності від значення action
-					//switch (wrapper.Type)
-					//{
-					//    case DataType.Login:
-					//        HandleLogin(parts);
-					//        break;
-					//    case "SEND":
-					//        HandleSendMessage(parts);
-					//        break;
-					//    case "GET_USERS":
-					//        // Реалізуйте обробку запиту на список користувачів
-					//        SendUserList();
-					//        break;
-					//    // Додаткові дії можна обробляти тут
-					//    default:
-					//        //Console.WriteLine("Unknown action: " + action);
-					//        break;
-					//}
-					//if (message == "exit")
-					//{
-					//    break;
-					//}
+                    // Обробка різних дій в залежності від значення action
+                    //switch (wrapper.Type)
+                    //{
+                    //    case DataType.Login:
+                    //        HandleLogin(parts);
+                    //        break;
+                    //    case "SEND":
+                    //        HandleSendMessage(parts);
+                    //        break;
+                    //    case "GET_USERS":
+                    //        // Реалізуйте обробку запиту на список користувачів
+                    //        SendUserList();
+                    //        break;
+                    //    // Додаткові дії можна обробляти тут
+                    //    default:
+                    //        //Console.WriteLine("Unknown action: " + action);
+                    //        break;
+                    //}
+                    //if (message == "exit")
+                    //{
+                    //    break;
+                    //}
 
-					// Очистити буфер для наступного повідомлення
-					data = new byte[1024];
+                    // Очистити буфер для наступного повідомлення
+                    data = new byte[1024];
 				}
 			}
 			catch (Exception ex)
@@ -158,34 +162,51 @@ namespace Server
 		{
 			// Реалізуйте логіку відправки списку користувачів на _stream
 			// Отримайте список користувачів з бази даних або деінде
-			List<string> users = GetUsersFromDatabase();
+			List<ChatUser> users = GetUsersFromDatabase();
 
-			// Створіть рядок зі списком користувачів, розділених "|"
-			string userListString = string.Join("|", users);
 
-			// Відправте рядок зі списком користувачів на _stream
-			byte[] data = Encoding.ASCII.GetBytes(userListString);
-			_stream.Write(data, 0, data.Length);
-		}
+			var wrapper = new DataWrapper
+			{
+				Type = DataType.GetUsers,
+				Content = JsonSerializer.Serialize(users)
+            };
+            // Створіть рядок зі списком користувачів, розділених "|"
+            //string userListString = string.Join("|", users);
 
-		private List<string> GetUsersFromDatabase()
+            // Відправте рядок зі списком користувачів на _stream
+            // Відправка відповіді клієнту
+
+            var json = JsonSerializer.Serialize(wrapper);
+            Console.WriteLine(json);
+            byte[] responseData = Encoding.UTF8.GetBytes(json);
+            _stream.Write(responseData, 0, responseData.Length);
+        }
+
+		private List<ChatUser> GetUsersFromDatabase()
 		{
-			List<string> users = new List<string>();
+            List<ChatUser> chatUsers = new List<ChatUser>();
 
-			try
-			{
-				using (var dbContext = new ServerContext())
-				{
-					users = dbContext.Users.Select(user => user.Name).ToList();
-				}
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine("Error getting users from the database: " + ex.Message);
-			}
+            try
+            {
+                using (var dbContext = new ServerContext())
+                {
+                    chatUsers = dbContext.Users
+                        .Select(user => new ChatUser
+                        {
+                            Id = user.Id,
+                            Name = user.Name,
+                            Login = user.Login
+                        })
+                        .ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error getting chat users from the database: " + ex.Message);
+            }
 
-			return users;
-		}
+            return chatUsers;
+        }
 
 		private int GetCurrentUserId()
 		{

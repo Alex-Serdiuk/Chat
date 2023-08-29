@@ -70,13 +70,13 @@ namespace Client
         private void LoadUserList()
         {
             // Ви можете використовувати ObservableCollection для автоматичного оновлення UI при змінах у списку користувачів
-            ObservableCollection<string> userList = new ObservableCollection<string>();
+            ObservableCollection<ChatUser> userList = new ObservableCollection<ChatUser>();
 
             // Отримайте список користувачів з сервера, наприклад, використовуючи TCP/IP
             // Ви маєте реалізувати логіку для отримання списку користувачів від сервера
-            List<string> users = GetUsersFromServer();
+            List<ChatUser>? users = _chatClient.GetUsersFromServer();
 
-            foreach (string user in users)
+            foreach (ChatUser user in users)
             {
                 userList.Add(user);
             }
@@ -85,43 +85,9 @@ namespace Client
             userListView.ItemsSource = userList;
         }
 
-        private List<string> GetUsersFromServer()
-        {
-            List<string> users = new List<string>();
 
-            try
-            {
-                // Встановіть з'єднання з сервером
-                TcpClient client = new TcpClient("127.0.0.1", 12345);
-                NetworkStream stream = client.GetStream();
-
-                // Відправте запит на отримання списку користувачів
-                byte[] data = Encoding.UTF8.GetBytes("GET_USERS");
-                stream.Write(data, 0, data.Length);
-
-                // Отримайте відповідь від сервера
-                data = new byte[1024];
-                int bytesRead = stream.Read(data, 0, data.Length);
-                string response = Encoding.UTF8.GetString(data, 0, bytesRead);
-
-                // Розібрати отриману відповідь і додати користувачів до списку
-                if (!string.IsNullOrEmpty(response))
-                {
-                    string[] userArray = response.Split('|');
-                    users.AddRange(userArray);
-                }
-
-                // Закрийте з'єднання
-                stream.Close();
-                client.Close();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error getting users from server: " + ex.Message);
-            }
-
-            return users;
-        }
+        List<ChatUser> users = new List<ChatUser>();
+       
 
     }
 }

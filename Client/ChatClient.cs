@@ -114,4 +114,26 @@ public class ChatClient
 
         return users;
     }
+
+    public bool SendMessage(ChatUser Me, ChatUser receiver, string message)
+    {
+        MessageData messageData = new MessageData();
+        messageData.From = Me;
+        messageData.To = receiver;
+        messageData.Text = message;
+
+        var requestWrapper = new DataWrapper
+        {
+            Type = DataType.SendMessage,
+            Content = JsonSerializer.Serialize(messageData)
+        };
+
+
+        SendData(JsonSerializer.Serialize(requestWrapper));
+        string responseData = ReceiveData();
+
+        var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
+        var result = JsonSerializer.Deserialize<MessageResponse>(responseWrapper.Content);
+        return result.IsSaveMessage;
+    }
 }

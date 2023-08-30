@@ -8,4 +8,5 @@ public static class DataType
 	public static readonly string GetUsers = "GET_USERS";
 	
 	public static readonly string GetMessages = "GET_MESSAGES";
+	public static readonly string SendMessage = "SEND_MESSAGE";
 }

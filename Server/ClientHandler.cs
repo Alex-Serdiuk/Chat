@@ -51,6 +51,9 @@ namespace Server
                     else if (wrapper.Type == DataType.GetUsers)
                     {
                         SendUserList();
+                    }else if (wrapper.Type == DataType.SendMessage)
+                    {
+                        HandleSendMessage(JsonSerializer.Deserialize<MessageData>(wrapper.Content));
                     }
 
 
@@ -128,37 +131,87 @@ namespace Server
 			_stream.Write(responseData, 0, responseData.Length);
 		}
 
-		private void HandleSendMessage(string[] parts)
+		private void HandleSendMessage(MessageData messageData)
 		{
 
-			// Отримання даних повідомлення
-			string content = parts[1];
+            //// Отримання даних повідомлення
+            //string content = parts[1];
 
-			// Отримання інформації про користувача-відправника
-			int senderId = GetCurrentUserId(); // Ваш спосіб отримання ID користувача
+            //// Отримання інформації про користувача-відправника
+            //int senderId = GetCurrentUserId(); // Ваш спосіб отримання ID користувача
 
-			// Отримання ID отримувача повідомлення (це може бути вибір зі списку, чи інше)
-			int receiverId = GetReceiverId(parts[2]); // Ваш спосіб отримання ID отримувача
+            //// Отримання ID отримувача повідомлення (це може бути вибір зі списку, чи інше)
+            //int receiverId = GetReceiverId(parts[2]); // Ваш спосіб отримання ID отримувача
 
-			// Створення об'єкта повідомлення
-			Message message = new Message
+            // Створення об'єкта повідомлення
+            Message? message = null;
+
+            message = new Message
 			{
-				From = users.FirstOrDefault(u => u.Id == senderId),
-				To = users.FirstOrDefault(u => u.Id == receiverId),
-				Text = content,
+				From = users.FirstOrDefault(u => u.Id == messageData.From.Id),
+				To = users.FirstOrDefault(u => u.Id == messageData.To.Id),
+				Text = messageData.Text,
 				CreatedAt = DateTime.Now
 			};
 
 			// Збереження повідомлення через чат-сервіс
 			_chatService.SaveMessage(message);
 
-			// Опціонально: Відправити підтвердження клієнту
-			string response = "MESSAGE_SENT";
-			byte[] responseData = Encoding.UTF8.GetBytes(response);
-			_stream.Write(responseData, 0, responseData.Length);
-		}
+            var response = new MessageResponse
+            {
+                IsSaveMessage = message!= null,
+            };
 
-		private void SendUserList()
+            var wrapper = new DataWrapper
+            {
+                Type = DataType.SendMessage,
+                Content = JsonSerializer.Serialize(response)
+            };
+
+            // Відправка відповіді клієнту
+
+            var json = JsonSerializer.Serialize(wrapper);
+            Console.WriteLine(json);
+            byte[] responseData = Encoding.UTF8.GetBytes(json);
+            _stream.Write(responseData, 0, responseData.Length);
+
+            //// Опціонально: Відправити підтвердження клієнту
+            //string response = "MESSAGE_SENT";
+            //byte[] responseData = Encoding.UTF8.GetBytes(response);
+            //_stream.Write(responseData, 0, responseData.Length);
+        }
+
+        //private void HandleSendMessage(string[] parts)
+        //{
+
+        //    // Отримання даних повідомлення
+        //    string content = parts[1];
+
+        //    // Отримання інформації про користувача-відправника
+        //    int senderId = GetCurrentUserId(); // Ваш спосіб отримання ID користувача
+
+        //    // Отримання ID отримувача повідомлення (це може бути вибір зі списку, чи інше)
+        //    int receiverId = GetReceiverId(parts[2]); // Ваш спосіб отримання ID отримувача
+
+        //    // Створення об'єкта повідомлення
+        //    Message message = new Message
+        //    {
+        //        From = users.FirstOrDefault(u => u.Id == senderId),
+        //        To = users.FirstOrDefault(u => u.Id == receiverId),
+        //        Text = content,
+        //        CreatedAt = DateTime.Now
+        //    };
+
+        //    // Збереження повідомлення через чат-сервіс
+        //    _chatService.SaveMessage(message);
+
+        //    // Опціонально: Відправити підтвердження клієнту
+        //    string response = "MESSAGE_SENT";
+        //    byte[] responseData = Encoding.UTF8.GetBytes(response);
+        //    _stream.Write(responseData, 0, responseData.Length);
+        //}
+
+        private void SendUserList()
 		{
 			// Реалізуйте логіку відправки списку користувачів на _stream
 			// Отримайте список користувачів з бази даних або деінде

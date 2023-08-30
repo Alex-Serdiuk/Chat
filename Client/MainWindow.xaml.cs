@@ -25,15 +25,24 @@ namespace Client
     public partial class MainWindow : Window
     {
         private ChatClient _chatClient;
-        
+
+        public ObservableCollection<MessageData> MessagessItems { set; get; }
+
+        // Ви можете використовувати ObservableCollection для автоматичного оновлення UI при змінах у списку користувачів
+        public ObservableCollection<string> userList = new ObservableCollection<string>();
+
         public MainWindow()
         {
             InitializeComponent();
 			_chatClient = new ChatClient("127.0.0.1", 12345);
 
+            MessagessItems = new ObservableCollection<MessageData>();
+
         }
 
         private ChatUser Me { get; set; }
+        private ChatUser? receiver { get; set; }
+        
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
@@ -43,10 +52,10 @@ namespace Client
                 Me = me;
 				// Переключіться на UI чату
 				loginPanel.Visibility = Visibility.Collapsed;
-				userListView.Visibility = Visibility.Visible;
+				userListBox.Visibility = Visibility.Visible;
 
 				// Завантажте список користувачів
-				//LoadUserList(); //TODO refactor
+				LoadUserList(); //TODO refactor
 			} else
 
             {
@@ -56,38 +65,74 @@ namespace Client
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
+            userListBox_Selected();
+            bool response= _chatClient.SendMessage(Me, receiver, messageTextBox.Text);
             // Отримайте повідомлення з текстового поля
-            string message = messageTextBox.Text;
-
-            // Відправте повідомлення на сервер
-            byte[] data = Encoding.UTF8.GetBytes($"SEND|{message}");
-            //_stream.Write(data, 0, data.Length);
+            
+            //// Відправте повідомлення на сервер
+            //byte[] data = Encoding.UTF8.GetBytes($"SEND|{message}");
+            ////_stream.Write(data, 0, data.Length);
 
             // Очистіть поле введення повідомлення
             messageTextBox.Text = string.Empty;
+
+            if (response)
+            {
+                MessageBox.Show("Message sent!");
+            }
+            else
+            {
+                MessageBox.Show("Sending failed!");
+            }
         }
 
+
+       
         private void LoadUserList()
         {
-            // Ви можете використовувати ObservableCollection для автоматичного оновлення UI при змінах у списку користувачів
-            ObservableCollection<ChatUser> userList = new ObservableCollection<ChatUser>();
-
+            userList.Clear();
+            userList.Add("Everyone");
+            
             // Отримайте список користувачів з сервера, наприклад, використовуючи TCP/IP
             // Ви маєте реалізувати логіку для отримання списку користувачів від сервера
-            List<ChatUser>? users = _chatClient.GetUsersFromServer();
+            users = _chatClient.GetUsersFromServer();
 
             foreach (ChatUser user in users)
             {
-                userList.Add(user);
+                userList.Add(user.Name);
             }
 
             // Прив'яжіть ObservableCollection до ListView на вашому інтерфейсі
-            userListView.ItemsSource = userList;
+            userListBox.ItemsSource = userList;
         }
 
 
-        List<ChatUser> users = new List<ChatUser>();
-       
+        List<ChatUser>? users = new List<ChatUser>();
 
+        private void userListBox_Selected()
+        {
+            // Отримайте вибраний елемент зі списку користувачів
+            string? selectedUserName = userListBox.SelectedItem as string;
+
+            if (!string.IsNullOrEmpty(selectedUserName) && selectedUserName != "Everyone")
+            {
+                // Знайдіть відповідного ChatUser за ім'ям
+                receiver = users.FirstOrDefault(user => user.Name == selectedUserName);
+
+                if (receiver != null)
+                {
+                    // Виведіть дані про обраного користувача
+                    MessageBox.Show($"User ID: {receiver.Id}\nName: {receiver.Name}\nLogin: {receiver.Login}");
+                }
+            }else if (selectedUserName == "Everyone")
+            {
+                receiver = null;
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -26,18 +26,19 @@ namespace Client
     {
         private ChatClient _chatClient;
 
-        public ObservableCollection<MessageData> MessagessItems { set; get; }
-
+        public ObservableCollection<string> MessagessItems;
         // Ви можете використовувати ObservableCollection для автоматичного оновлення UI при змінах у списку користувачів
-        public ObservableCollection<string> userList = new ObservableCollection<string>();
+        public ObservableCollection<string> userList;
+        List<ChatUser>? users = new List<ChatUser>();
+        List<MessageData>? messages = new List<MessageData>();
 
         public MainWindow()
         {
             InitializeComponent();
 			_chatClient = new ChatClient("127.0.0.1", 12345);
 
-            MessagessItems = new ObservableCollection<MessageData>();
-
+            MessagessItems = new ObservableCollection<string>();
+            userList = new ObservableCollection<string>();
         }
 
         private ChatUser Me { get; set; }
@@ -84,6 +85,8 @@ namespace Client
             {
                 MessageBox.Show("Sending failed!");
             }
+
+            LoadViewMessages();
         }
 
 
@@ -91,7 +94,7 @@ namespace Client
         private void LoadUserList()
         {
             userList.Clear();
-            userList.Add("Everyone");
+            //userList.Add("Everyone");
             
             // Отримайте список користувачів з сервера, наприклад, використовуючи TCP/IP
             // Ви маєте реалізувати логіку для отримання списку користувачів від сервера
@@ -106,8 +109,34 @@ namespace Client
             userListBox.ItemsSource = userList;
         }
 
+        public int startId;
 
-        List<ChatUser>? users = new List<ChatUser>();
+        public void LoadViewMessages()
+        {
+            userListBox_Selected();
+            startId = 0;
+            GetMessagesRequest request = new GetMessagesRequest();
+            request = new GetMessagesRequest()
+            {
+                From = Me,
+                To = receiver,
+                AfterId = startId
+            };
+            messages = _chatClient.LoadMessages(request);
+
+            messageListBox.Items.Clear();
+
+            foreach (MessageData message in messages)
+            {
+                string senderName = message.From.Name;
+                string formattedMessage = $"{senderName} ({message.CreatedAt}): {message.Text}";
+                MessagessItems.Add(formattedMessage);
+            }
+            messageListBox.ItemsSource = MessagessItems;
+        }
+
+
+        
 
         private void userListBox_Selected()
         {
@@ -130,9 +159,9 @@ namespace Client
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void UpdateButton_Click(object sender, RoutedEventArgs e)
         {
-
+            LoadViewMessages();
         }
     }
 }

@@ -31,18 +31,22 @@ namespace Server
 		{
 			try
 			{
-				byte[] data = new byte[1024];
-				int bytesRead;
+                var buffer = new byte[1024];
+                int bytesRead;
 
 				while (true)
 				{
-					bytesRead = _stream.Read(data, 0, data.Length);
+                    bytesRead = 0;
+                    string strData = "";
+                    do
+                    {
+                        bytesRead = _stream.Read(buffer, 0, buffer.Length);
+                        strData += Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    } while (bytesRead > 1024);
 
-					string message = Encoding.UTF8.GetString(data, 0, bytesRead);
+                    Console.WriteLine(strData);
 
-					Console.WriteLine(message);
-
-					var wrapper = JsonSerializer.Deserialize<DataWrapper>(message);
+					var wrapper = JsonSerializer.Deserialize<DataWrapper>(strData);
 
 					if (wrapper.Type == DataType.Login)
 					{
@@ -51,9 +55,14 @@ namespace Server
                     else if (wrapper.Type == DataType.GetUsers)
                     {
                         SendUserList();
+
                     }else if (wrapper.Type == DataType.SendMessage)
                     {
                         HandleSendMessage(JsonSerializer.Deserialize<MessageData>(wrapper.Content));
+                    }
+                    else if (wrapper.Type == DataType.GetMessages)
+                    {
+                        HandleGetMessages(JsonSerializer.Deserialize<GetMessagesRequest>(wrapper.Content));
                     }
 
 
@@ -82,7 +91,7 @@ namespace Server
                     //}
 
                     // Очистити буфер для наступного повідомлення
-                    data = new byte[1024];
+                    buffer = new byte[1024];
 				}
 			}
 			catch (Exception ex)
@@ -211,30 +220,7 @@ namespace Server
         //    _stream.Write(responseData, 0, responseData.Length);
         //}
 
-        private void SendUserList()
-		{
-			// Реалізуйте логіку відправки списку користувачів на _stream
-			// Отримайте список користувачів з бази даних або деінде
-			List<ChatUser> users = GetUsersFromDatabase();
-
-
-			var wrapper = new DataWrapper
-			{
-				Type = DataType.GetUsers,
-				Content = JsonSerializer.Serialize(users)
-            };
-            // Створіть рядок зі списком користувачів, розділених "|"
-            //string userListString = string.Join("|", users);
-
-            // Відправте рядок зі списком користувачів на _stream
-            // Відправка відповіді клієнту
-
-            var json = JsonSerializer.Serialize(wrapper);
-            Console.WriteLine(json);
-            byte[] responseData = Encoding.UTF8.GetBytes(json);
-            _stream.Write(responseData, 0, responseData.Length);
-        }
-
+        
 		private List<ChatUser> GetUsersFromDatabase()
 		{
             List<ChatUser> chatUsers = new List<ChatUser>();
@@ -261,7 +247,63 @@ namespace Server
             return chatUsers;
         }
 
-		private int GetCurrentUserId()
+        private void SendUserList()
+        {
+            // Реалізуйте логіку відправки списку користувачів на _stream
+            // Отримайте список користувачів з бази даних або деінде
+            List<ChatUser> users = GetUsersFromDatabase();
+
+
+            var wrapper = new DataWrapper
+            {
+                Type = DataType.GetUsers,
+                Content = JsonSerializer.Serialize(users)
+            };
+            // Створіть рядок зі списком користувачів, розділених "|"
+            //string userListString = string.Join("|", users);
+
+            // Відправте рядок зі списком користувачів на _stream
+            // Відправка відповіді клієнту
+
+            var json = JsonSerializer.Serialize(wrapper);
+            Console.WriteLine(json);
+            byte[] responseData = Encoding.UTF8.GetBytes(json);
+            _stream.Write(responseData, 0, responseData.Length);
+        }
+
+        private void HandleGetMessages(GetMessagesRequest request)
+        {
+            List<MessageData> sendMessages = new List<MessageData>();
+
+            List<Message> messages = _chatService.GetMessages(request.From.Id, request.To.Id);
+
+            for (int i = (int)request.AfterId; i < messages.Count; i++)
+            {
+                Message message = messages[i];
+                MessageData messageData = new MessageData
+                {
+                    From = request.From,
+                    To = request.To,
+                    CreatedAt = message.CreatedAt,
+                    Text = message.Text
+                };
+
+                sendMessages.Add(messageData);
+
+                var wrapper = new DataWrapper
+                {
+                    Type = DataType.GetUsers,
+                    Content = JsonSerializer.Serialize(sendMessages)
+                };
+
+                var json = JsonSerializer.Serialize(wrapper);
+                Console.WriteLine(json);
+                byte[] responseData = Encoding.UTF8.GetBytes(json);
+                _stream.Write(responseData, 0, responseData.Length);
+            }
+        }
+
+        private int GetCurrentUserId()
 		{
 			// Отримайте ID поточного авторизованого користувача зі свого механізму аутентифікації.
 			// Наприклад, якщо ви використовуєте аутентифікацію на основі JWT, тут ви можете отримати ID з JWT токену.

@@ -16,11 +16,29 @@
             <ColumnDefinition Width="70*"></ColumnDefinition>
             <ColumnDefinition Width="30*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <ListBox Grid.Row="1" Grid.Column="0"
-                 HorizontalAlignment="Center"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox x:Name="messageListBox"
+            Grid.Row="1" Grid.Column="0"
+                 >
+            <!--<ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Ellipse Grid.Column="0" Width="50" Height="50" Margin="10" Fill="{Binding Sender.Color}"/>
+                        <StackPanel Grid.Column="1" Margin="10">
+                            <TextBlock Text="{Binding Sender.Name}" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Content}" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding Time}" HorizontalAlignment="Right" Foreground="Gray"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>-->
+            
             
         </ListBox>
+        <Button x:Name="UpdateButton" Margin="2" Grid.Column="1" Grid.Row="0" Click="UpdateButton_Click" >Update Messages</Button>
         <TextBox x:Name="messageTextBox" Margin="5" Grid.Row="2" Grid.Column="0"></TextBox>
         <Button x:Name="SendButton" Margin="10" Grid.Column="1" Grid.Row="2" Click="SendButton_Click" >Send</Button>
 

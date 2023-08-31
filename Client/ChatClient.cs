@@ -136,4 +136,22 @@ public class ChatClient
         var result = JsonSerializer.Deserialize<MessageResponse>(responseWrapper.Content);
         return result.IsSaveMessage;
     }
+
+    public List<MessageData>? LoadMessages(GetMessagesRequest request)
+    {
+        List<MessageData>? messages = new List<MessageData>();
+        var requestWrapper = new DataWrapper
+        {
+            Type = DataType.GetMessages,
+            Content = JsonSerializer.Serialize(request)
+        };
+
+        SendData(JsonSerializer.Serialize(requestWrapper));
+        string responseData = ReceiveData();
+        var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
+        messages = JsonSerializer.Deserialize<List<MessageData>>(responseWrapper.Content);
+        return messages;
+    }
+
+    
 }

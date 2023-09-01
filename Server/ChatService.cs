@@ -1,4 +1,5 @@
-﻿using Server.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Server.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +39,7 @@ namespace Server
 
         public User GetUserById(int userId)
         {
-            User? user = null;
+            User user = new User();
 
             try
             {
@@ -58,20 +59,28 @@ namespace Server
         public List<Message> GetMessages(int senderId, int receiverId)
         {
             
-                List<Message> messages = new List<Message>();
+            List<Message> messages = new List<Message>();
             User sender = GetUserById(senderId);
             User receiver = GetUserById(receiverId);
                 try
                 {
                     using (var dbContext = new ServerContext())
                     {
-                        messages = dbContext.Messages
+                    messages = dbContext.Messages
+                            .Include(message => message.From)
+                            .Include(message => message.To)
                             .Where(message =>
-                                (message.From == sender && message.To == receiver) ||
-                                (message.To == receiver && message.To == sender))
+                    (message.From.Id == senderId && message.To.Id == receiverId) ||
+                    (message.From.Id == receiverId && message.To.Id == senderId))
                             .OrderBy(message => message.CreatedAt)
                             .ToList();
-                    }
+                    //messages = dbContext.Messages
+                    //    .Where(message =>
+                    //        (message.From == sender && message.To == receiver) ||
+                    //        (message.From == receiver && message.To == sender))
+                    //    .OrderBy(message => message.CreatedAt)
+                    //    .ToList();
+                }
                 }
                 catch (Exception ex)
                 {

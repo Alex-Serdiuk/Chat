@@ -45,9 +45,9 @@ namespace Client
         private ChatUser? receiver { get; set; }
         
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            var me = _chatClient.Login(usernameTextBox.Text, passwordBox.Password);
+            var me = await _chatClient.LoginAsync(loginTextBox.Text, passwordBox.Password);
 
 			if (me is ChatUser) {
                 Me = me;
@@ -64,10 +64,10 @@ namespace Client
 			}
         }
 
-        private void SendButton_Click(object sender, RoutedEventArgs e)
+        private async void SendButton_Click(object sender, RoutedEventArgs e)
         {
             userListBox_Selected();
-            bool response= _chatClient.SendMessage(Me, receiver, messageTextBox.Text);
+            bool response= await _chatClient.SendMessage(Me, receiver, messageTextBox.Text);
             // Отримайте повідомлення з текстового поля
             
             //// Відправте повідомлення на сервер
@@ -91,14 +91,14 @@ namespace Client
 
 
        
-        private void LoadUserList()
+        private async void LoadUserList()
         {
             userList.Clear();
             //userList.Add("Everyone");
             
             // Отримайте список користувачів з сервера, наприклад, використовуючи TCP/IP
             // Ви маєте реалізувати логіку для отримання списку користувачів від сервера
-            users = _chatClient.GetUsersFromServer();
+            users = await _chatClient.GetUsersFromServerAsync();
 
             foreach (ChatUser user in users)
             {
@@ -111,7 +111,7 @@ namespace Client
 
         public int startId;
 
-        public void LoadViewMessages()
+        public async void LoadViewMessages()
         {
             userListBox_Selected();
             startId = 0;
@@ -122,14 +122,13 @@ namespace Client
                 To = receiver,
                 AfterId = startId
             };
-            messages = _chatClient.LoadMessages(request);
+            messages = await _chatClient.LoadMessagesAsync(request);
 
             messageListBox.Items.Clear();
 
             foreach (MessageData message in messages)
             {
-                string senderName = message.From.Name;
-                string formattedMessage = $"{senderName} ({message.CreatedAt}): {message.Text}";
+                string formattedMessage = $"{message.From.Name} ({message.CreatedAt}): {message.Text}";
                 MessagessItems.Add(formattedMessage);
             }
             messageListBox.ItemsSource = MessagessItems;

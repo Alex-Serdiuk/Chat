@@ -246,6 +246,25 @@ namespace Server
 
             return chatUsers;
         }
+        private ChatUser GetChatUserById(int id)
+        {
+            ChatUser chatUser = new ChatUser();
+            try
+            {
+                User user = _chatService.GetUserById(id);
+
+                chatUser.Id = user.Id;
+                chatUser.Name = user.Name;
+                chatUser.Login = user.Login;
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error getting chat users from the database: " + ex.Message);
+            }
+
+            return chatUser;
+        }
 
         private void SendUserList()
         {
@@ -282,25 +301,26 @@ namespace Server
                 Message message = messages[i];
                 MessageData messageData = new MessageData
                 {
-                    From = request.From,
-                    To = request.To,
+                    From = GetChatUserById(message.From.Id),
+                    To = GetChatUserById(message.To.Id),
                     CreatedAt = message.CreatedAt,
                     Text = message.Text
                 };
 
                 sendMessages.Add(messageData);
 
-                var wrapper = new DataWrapper
-                {
-                    Type = DataType.GetUsers,
-                    Content = JsonSerializer.Serialize(sendMessages)
-                };
-
-                var json = JsonSerializer.Serialize(wrapper);
-                Console.WriteLine(json);
-                byte[] responseData = Encoding.UTF8.GetBytes(json);
-                _stream.Write(responseData, 0, responseData.Length);
+               
             }
+            var wrapper = new DataWrapper
+            {
+                Type = DataType.GetUsers,
+                Content = JsonSerializer.Serialize(sendMessages)
+            };
+
+            var json = JsonSerializer.Serialize(wrapper);
+            Console.WriteLine(json);
+            byte[] responseData = Encoding.UTF8.GetBytes(json);
+            _stream.Write(responseData, 0, responseData.Length);
         }
 
         private int GetCurrentUserId()

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="LoginRegisterWindow" Height="420" Width="370">
+        Title="LoginRegisterWindow" Height="320" Width="370">
     <Grid>
         <TabControl>
             <TabItem Header="Login">
@@ -34,14 +34,16 @@
                         <PasswordBox x:Name="passwordBox" Grid.Column="1" Margin="5" />
                     </Grid>
 
-                    <Button Content="Login"  Grid.Row="2" Margin="5"/>
+                    <Button Content="Login" Click="LoginButton_Click" Grid.Row="2" Margin="5" />
                 </Grid>
             </TabItem>
             <TabItem Header="Register">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="18*"/>
-                        <ColumnDefinition Width="65*"/>
+                        <ColumnDefinition Width="11*"/>
+                        <ColumnDefinition Width="7*"/>
+                        <ColumnDefinition Width="58*"/>
+                        <ColumnDefinition Width="7*"/>
                         <ColumnDefinition Width="281*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -50,7 +52,7 @@
                         <RowDefinition Height="50"></RowDefinition>
                         <RowDefinition Height="50"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0" Grid.ColumnSpan="3">
+                    <Grid Grid.Row="0" Grid.ColumnSpan="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="30*"></ColumnDefinition>
                             <ColumnDefinition Width="70*"></ColumnDefinition>
@@ -58,7 +60,7 @@
                         <Label Content="Name" Grid.Column="0"/>
                         <TextBox x:Name="usernameTextBoxReg"  Margin="5" Grid.Column="1"/>
                     </Grid>
-                    <Grid Grid.Row="1" Grid.ColumnSpan="3">
+                    <Grid Grid.Row="1" Grid.ColumnSpan="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="30*"></ColumnDefinition>
                             <ColumnDefinition Width="70*"></ColumnDefinition>
@@ -66,7 +68,7 @@
                         <Label Content="Login" Grid.Column="0"/>
                         <TextBox x:Name="loginTextBoxReg"  Margin="5" Grid.Column="1"/>
                     </Grid>
-                    <Grid Grid.Row="2" Grid.ColumnSpan="3">
+                    <Grid Grid.Row="2" Grid.ColumnSpan="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="30*"></ColumnDefinition>
                             <ColumnDefinition Width="70*"></ColumnDefinition>
@@ -75,7 +77,7 @@
                         <PasswordBox x:Name="passwordBoxReg" Grid.Column="1" Margin="5" />
                     </Grid>
 
-                    <Button Content="Register"  Grid.Row="3" Margin="5,5,5,5" Grid.ColumnSpan="3"/>
+                    <Button x:Name="RegisterButton" Content="Register"  Grid.Row="3" Margin="5,5,5,5" Grid.ColumnSpan="5" Click="RegisterButton_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>

@@ -44,12 +44,12 @@
 
         <Grid Grid.Column="1" Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="58*"></RowDefinition>
+                <!--<RowDefinition Height="58*"></RowDefinition>-->
                 <RowDefinition Height="105*"></RowDefinition>
 
             </Grid.RowDefinitions>
             <!-- UI для авторизації -->
-            <Grid x:Name="loginPanel" Grid.Row="0" Margin="5,5,5,9">
+            <!--<Grid x:Name="loginPanel" Grid.Row="0" Margin="5,5,5,9">
                 <Grid.RowDefinitions>
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
@@ -73,11 +73,11 @@
                 </Grid>
 
                 <Button Content="Login" Click="LoginButton_Click" Grid.Row="2" Margin="5"/>
-            </Grid>
+            --><!--</Grid>-->
             <!-- UI для списку Юзерів -->
             <ListBox x:Name="userListBox"
-                     Grid.Row="1" 
-                     Visibility="Collapsed"  
+                     Grid.Row="0" 
+                      
                      Margin="5,5,5,5"
                       />
         </Grid>

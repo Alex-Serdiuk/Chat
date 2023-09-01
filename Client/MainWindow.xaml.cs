@@ -24,7 +24,7 @@ namespace Client
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ChatClient _chatClient;
+        internal ChatClient _chatClient;
 
         public ObservableCollection<string> MessagessItems;
         // Ви можете використовувати ObservableCollection для автоматичного оновлення UI при змінах у списку користувачів
@@ -32,37 +32,53 @@ namespace Client
         List<ChatUser>? users = new List<ChatUser>();
         List<MessageData>? messages = new List<MessageData>();
 
-        public MainWindow()
+        public MainWindow(ChatUser me, ChatClient chatClient)
         {
             InitializeComponent();
-			_chatClient = new ChatClient("127.0.0.1", 12345);
+            Me = me;
+            _chatClient = chatClient;
 
             MessagessItems = new ObservableCollection<string>();
             userList = new ObservableCollection<string>();
+            if (me is ChatUser)
+            {
+                Me = me;
+                // Переключіться на UI чату
+                //loginPanel.Visibility = Visibility.Collapsed;
+                //userListBox.Visibility = Visibility.Visible;
+
+                // Завантажте список користувачів
+                LoadUserList(); //TODO refactor
+            }
+            else
+
+            {
+                MessageBox.Show("Authentication failed.");
+            }
         }
 
         private ChatUser Me { get; set; }
         private ChatUser? receiver { get; set; }
         
 
-        private void LoginButton_Click(object sender, RoutedEventArgs e)
-        {
-            var me = _chatClient.Login(loginTextBox.Text, passwordBox.Password);
+   //     private void LoginButton_Click(object sender, RoutedEventArgs e)
+   //     {
+   //         var me = _chatClient.Login(loginTextBox.Text, passwordBox.Password);
 
-			if (me is ChatUser) {
-                Me = me;
-				// Переключіться на UI чату
-				loginPanel.Visibility = Visibility.Collapsed;
-				userListBox.Visibility = Visibility.Visible;
+			//if (me is ChatUser) {
+   //             Me = me;
+			//	// Переключіться на UI чату
+			//	loginPanel.Visibility = Visibility.Collapsed;
+			//	userListBox.Visibility = Visibility.Visible;
 
-				// Завантажте список користувачів
-				LoadUserList(); //TODO refactor
-			} else
+			//	// Завантажте список користувачів
+			//	LoadUserList(); //TODO refactor
+			//} else
 
-            {
-				MessageBox.Show("Authentication failed.");
-			}
-        }
+   //         {
+			//	MessageBox.Show("Authentication failed.");
+			//}
+   //     }
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {

@@ -2,7 +2,7 @@
 
 namespace CommonLibrary;
 
-public class RagisterData
+public class RegisterData
 {
 	public string Name { get; set; }
 	public string Login { get; set; }

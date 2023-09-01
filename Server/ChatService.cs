@@ -37,16 +37,15 @@ namespace Server
             _context.SaveChanges();
         }
 
-        public User GetUserById(int userId)
+        public User? GetUserById(int userId)
         {
-            User user = new User();
+            User? user = new User();
 
             try
             {
-                using (var dbContext = new ServerContext())
-                {
-                    user = dbContext.Users.FirstOrDefault(u => u.Id == userId);
-                }
+                
+                    user = _context.Users.FirstOrDefault(u => u.Id == userId);
+                
             }
             catch (Exception ex)
             {
@@ -60,13 +59,12 @@ namespace Server
         {
             
             List<Message> messages = new List<Message>();
-            User sender = GetUserById(senderId);
-            User receiver = GetUserById(receiverId);
+            User? sender = GetUserById(senderId);
+            User? receiver = GetUserById(receiverId);
                 try
                 {
-                    using (var dbContext = new ServerContext())
-                    {
-                    messages = dbContext.Messages
+                   
+                    messages = _context.Messages
                             .Include(message => message.From)
                             .Include(message => message.To)
                             .Where(message =>
@@ -80,7 +78,7 @@ namespace Server
                     //        (message.From == receiver && message.To == sender))
                     //    .OrderBy(message => message.CreatedAt)
                     //    .ToList();
-                }
+                
                 }
                 catch (Exception ex)
                 {
@@ -91,24 +89,25 @@ namespace Server
             
         }
 
-        private bool RegisterUser(string username, string login, string password)
+        public User? RegisterUser(string username, string login, string password)
         {
+            Console.WriteLine("Try reg: {0} {1}", login, password);
+            
             try
             {
-                using (var dbContext = new ServerContext())
-                {
+                
                     // Перевірте, чи ім'я користувача вже існує
-                    if (dbContext.Users.Any(u => u.Name == username))
+                    if (_context.Users.Any(u => u.Name == username))
                     {
                         Console.WriteLine("Username already exists.");
-                        return false;
+                        return null;
                     }
 
                     // Перевірте, чи логін користувача вже існує
-                    if (dbContext.Users.Any(u => u.Login == login))
+                    if (_context.Users.Any(u => u.Login == login))
                     {
                         Console.WriteLine("Login already exists.");
-                        return false;
+                        return null;
                     }
 
                     // Створіть нового користувача
@@ -119,16 +118,16 @@ namespace Server
                         Password = password
                     };
 
-                    dbContext.Users.Add(newUser);
-                    dbContext.SaveChanges();
+                    _context.Users.Add(newUser);
+                    _context.SaveChanges();
 
-                    return true;
-                }
+                return newUser;
+                
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error registering user: " + ex.Message);
-                return false;
+                return null;
             }
         }
 

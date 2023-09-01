@@ -52,6 +52,10 @@ namespace Server
 					{
 						HandleLogin(JsonSerializer.Deserialize<LoginData>(wrapper.Content));
 					}
+                    else if (wrapper.Type == DataType.Register)
+                    {
+                        HandleRegister(JsonSerializer.Deserialize<RegisterData>(wrapper.Content));
+                    }
                     else if (wrapper.Type == DataType.GetUsers)
                     {
                         SendUserList();
@@ -140,7 +144,42 @@ namespace Server
 			_stream.Write(responseData, 0, responseData.Length);
 		}
 
-		private void HandleSendMessage(MessageData messageData)
+        private void HandleRegister(RegisterData registerData)
+        {
+            // Отримання даних для регістрації
+            string username = registerData.Name;
+            string login = registerData.Login;
+            string password = registerData.Password;
+
+            // Перевірка авторизації через чат-сервіс
+            var user = _chatService.RegisterUser(username, login, password);
+
+            var response = new LoginResponse
+            {
+                IsLoggedIn = user != null,
+                User = user != null ? new ChatUser
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Login = user.Login,
+                } : null
+            };
+
+            var wrapper = new DataWrapper
+            {
+                Type = DataType.Register,
+                Content = JsonSerializer.Serialize(response)
+            };
+
+            // Відправка відповіді клієнту
+
+            var json = JsonSerializer.Serialize(wrapper);
+            Console.WriteLine(json);
+            byte[] responseData = Encoding.UTF8.GetBytes(json);
+            _stream.Write(responseData, 0, responseData.Length);
+        }
+
+        private void HandleSendMessage(MessageData messageData)
 		{
 
             //// Отримання даних повідомлення
@@ -313,7 +352,7 @@ namespace Server
             }
             var wrapper = new DataWrapper
             {
-                Type = DataType.GetUsers,
+                Type = DataType.GetMessages,
                 Content = JsonSerializer.Serialize(sendMessages)
             };
 

@@ -29,7 +29,7 @@ public class ChatClient
 		_stream.Write(Encoding.UTF8.GetBytes(data), 0, data.Length);
 	}
 
-    //private string ReceiveData()
+    //private string ReceiveData() //TODO не працює зчитування з буферу при перевищенні виділленого розміру
     //{
     //    //using (var memoryStream = new MemoryStream())
     //    //{
@@ -93,6 +93,29 @@ public class ChatClient
 		var result = JsonSerializer.Deserialize<LoginResponse>(responseWrapper.Content);
 		return result.User;
 	}
+
+    public ChatUser? Register(string name, string login, string password)
+    {
+        var registerData = new RegisterData
+        {
+            Name = name,
+            Login = login,
+            Password = password
+        };
+
+        var requestWrapper = new DataWrapper
+        {
+            Type = DataType.Register,
+            Content = JsonSerializer.Serialize(registerData)
+        };
+
+        SendData(JsonSerializer.Serialize(requestWrapper));
+        string responseData = ReceiveData();
+
+        var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
+        var result = JsonSerializer.Deserialize<LoginResponse>(responseWrapper.Content);
+        return result.User;
+    }
 
     public List<ChatUser>? GetUsersFromServer()
     {

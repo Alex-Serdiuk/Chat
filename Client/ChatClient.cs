@@ -63,41 +63,16 @@ public class ChatClient
 
 
 
-    //private string ReceiveData()
-    //{
-    //    var data = new byte[4096];
-    //    int bytesRead = _stream.Read(data, 0, data.Length);
-    //    return Encoding.UTF8.GetString(data, 0, bytesRead);
-    //}
-
-    private async Task<string> ReceiveData()
+    private string ReceiveData()
     {
-        byte[] buffer = new byte[4096];
-        int bytesRead;
-        MemoryStream memoryStream = new MemoryStream();
-
-        try
-        {
-            do
-            {
-                bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
-                if (bytesRead > 0)
-                {
-                    memoryStream.Write(buffer, 0, bytesRead);
-                }
-            } while (bytesRead > 0);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error receiving data: " + ex.Message);
-            return string.Empty;
-        }
-
-        // Повертаємо рядок UTF-8 з MemoryStream
-        return Encoding.UTF8.GetString(memoryStream.ToArray());
+        var data = new byte[4096];
+        int bytesRead = _stream.Read(data, 0, data.Length);
+        return Encoding.UTF8.GetString(data, 0, bytesRead);
     }
 
-    public async Task<ChatUser?> LoginAsync(string login, string password)
+
+
+    public ChatUser? Login(string login, string password)
 	{
 		var loginData = new LoginData
 		{
@@ -112,14 +87,14 @@ public class ChatClient
 		};
 
 		SendData(JsonSerializer.Serialize(requestWrapper));
-		string responseData = await ReceiveData();
+		string responseData = ReceiveData();
 
 		var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
 		var result = JsonSerializer.Deserialize<LoginResponse>(responseWrapper.Content);
 		return result.User;
 	}
 
-    public async Task<List<ChatUser>?> GetUsersFromServerAsync()
+    public List<ChatUser>? GetUsersFromServer()
     {
 
         List<ChatUser>? users = new List<ChatUser>();
@@ -133,7 +108,7 @@ public class ChatClient
             };
 
             SendData(JsonSerializer.Serialize(requestWrapper));
-            string responseData = await ReceiveData();
+            string responseData = ReceiveData();
 
             var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
             users = JsonSerializer.Deserialize<List<ChatUser>>(responseWrapper.Content);
@@ -146,7 +121,7 @@ public class ChatClient
         return users;
     }
 
-    public async Task<List<MessageData>?> LoadMessagesAsync(GetMessagesRequest request)
+    public List<MessageData>? LoadMessages(GetMessagesRequest request)
     {
         List<MessageData>? messages = new List<MessageData>();
         try
@@ -158,7 +133,7 @@ public class ChatClient
             };
 
             SendData(JsonSerializer.Serialize(requestWrapper));
-            string responseData = await ReceiveData();
+            string responseData = ReceiveData();
             var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
             messages = JsonSerializer.Deserialize<List<MessageData>>(responseWrapper.Content);
         }
@@ -170,7 +145,7 @@ public class ChatClient
         return messages;
     }
 
-    public async Task<bool> SendMessage(ChatUser Me, ChatUser receiver, string message)
+    public bool SendMessage(ChatUser Me, ChatUser receiver, string message)
     {
         MessageData messageData = new MessageData();
         messageData.From = Me;
@@ -185,7 +160,7 @@ public class ChatClient
 
 
         SendData(JsonSerializer.Serialize(requestWrapper));
-        string responseData =await ReceiveData();
+        string responseData = ReceiveData();
 
         var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
         var result = JsonSerializer.Deserialize<MessageResponse>(responseWrapper.Content);

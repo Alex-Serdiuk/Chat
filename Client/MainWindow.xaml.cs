@@ -45,9 +45,9 @@ namespace Client
         private ChatUser? receiver { get; set; }
         
 
-        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            var me = await _chatClient.LoginAsync(loginTextBox.Text, passwordBox.Password);
+            var me = _chatClient.Login(loginTextBox.Text, passwordBox.Password);
 
 			if (me is ChatUser) {
                 Me = me;
@@ -64,10 +64,10 @@ namespace Client
 			}
         }
 
-        private async void SendButton_Click(object sender, RoutedEventArgs e)
+        private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             userListBox_Selected();
-            bool response= await _chatClient.SendMessage(Me, receiver, messageTextBox.Text);
+            bool response= _chatClient.SendMessage(Me, receiver, messageTextBox.Text);
             // Отримайте повідомлення з текстового поля
             
             //// Відправте повідомлення на сервер
@@ -91,14 +91,14 @@ namespace Client
 
 
        
-        private async void LoadUserList()
+        private void LoadUserList()
         {
             userList.Clear();
             //userList.Add("Everyone");
             
             // Отримайте список користувачів з сервера, наприклад, використовуючи TCP/IP
             // Ви маєте реалізувати логіку для отримання списку користувачів від сервера
-            users = await _chatClient.GetUsersFromServerAsync();
+            users = _chatClient.GetUsersFromServer();
 
             foreach (ChatUser user in users)
             {
@@ -111,7 +111,7 @@ namespace Client
 
         public int startId;
 
-        public async void LoadViewMessages()
+        public void LoadViewMessages()
         {
             userListBox_Selected();
             startId = 0;
@@ -122,7 +122,7 @@ namespace Client
                 To = receiver,
                 AfterId = startId
             };
-            messages = await _chatClient.LoadMessagesAsync(request);
+            messages = _chatClient.LoadMessages(request);
 
             messageListBox.Items.Clear();
 

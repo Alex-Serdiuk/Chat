@@ -29,24 +29,8 @@ public class ChatClient
 		_stream.Write(Encoding.UTF8.GetBytes(data), 0, data.Length);
 	}
 
-    private string ReceiveData() //TODO не працює зчитування з буферу при перевищенні виділленого розміру
+    private string ReceiveData()
     {
-        //using (var memoryStream = new MemoryStream())
-        //{
-        //    var buffer = new byte[1024];
-        //    int bytesRead = 0;
-
-        //    do
-        //    {
-        //        bytesRead = _stream.Read(buffer, 0, buffer.Length);
-        //        memoryStream.Write(buffer, 0, bytesRead);
-        //    } while (bytesRead > 1024);
-
-        //    // Перетворюємо MemoryStream у рядок
-        //    return Encoding.UTF8.GetString(memoryStream.ToArray());
-        //}
-
-
         var buffer = new byte[1024];
         int bytesRead = 0;
 
@@ -62,14 +46,6 @@ public class ChatClient
         return strData;
     }
 
-
-
-    //private string ReceiveData()
-    //{
-    //    var data = new byte[4096];
-    //    int bytesRead = _stream.Read(data, 0, data.Length);
-    //    return Encoding.UTF8.GetString(data, 0, bytesRead);
-    //}
 
 
 

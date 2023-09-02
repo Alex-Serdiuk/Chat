@@ -35,6 +35,7 @@ namespace Client
         public MainWindow(ChatUser me, ChatClient chatClient)
         {
             InitializeComponent();
+
             Me = me;
             _chatClient = chatClient;
             ClientLable.Content = "Client: " + me.Name.ToString();

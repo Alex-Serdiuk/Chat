@@ -37,7 +37,7 @@ namespace Client
             InitializeComponent();
             Me = me;
             _chatClient = chatClient;
-
+            ClientLable.Content = "Client: " + me.Name.ToString();
             MessagessItems = new ObservableCollection<string>();
             userList = new ObservableCollection<string>();
             if (me is ChatUser)
@@ -109,6 +109,7 @@ namespace Client
        
         private void LoadUserList()
         {
+            userListBox.ItemsSource = null;
             userList.Clear();
             //userList.Add("Everyone");
             
@@ -130,7 +131,7 @@ namespace Client
         public void LoadViewMessages()
         {
             userListBox_Selected();
-            startId = 0;
+            startId = 0; //TODO звідки брати Id першого повідомлення
             GetMessagesRequest request = new GetMessagesRequest();
             request = new GetMessagesRequest()
             {
@@ -138,13 +139,14 @@ namespace Client
                 To = receiver,
                 AfterId = startId
             };
-            messages = _chatClient.LoadMessages(request);
+            messages = _chatClient.GetMessagesFromServer(request);
 
-            messageListBox.Items.Clear();
+            messageListBox.ItemsSource = null;
+            MessagessItems.Clear();
 
             foreach (MessageData message in messages)
             {
-                string formattedMessage = $"{message.From.Name} ({message.CreatedAt}): {message.Text}";
+                string formattedMessage = $"{users.FirstOrDefault(user => user.Id == message.FromId).Name} ({message.CreatedAt}): {message.Text}";
                 MessagessItems.Add(formattedMessage);
             }
             messageListBox.ItemsSource = MessagessItems;
@@ -168,10 +170,11 @@ namespace Client
                     // Виведіть дані про обраного користувача
                     MessageBox.Show($"User ID: {receiver.Id}\nName: {receiver.Name}\nLogin: {receiver.Login}");
                 }
-            }else if (selectedUserName == "Everyone")
-            {
-                receiver = null;
             }
+            //else if (selectedUserName == "Everyone")
+            //{
+            //    receiver = null;
+            //}
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)

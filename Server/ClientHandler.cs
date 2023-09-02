@@ -196,8 +196,8 @@ namespace Server
 
             message = new Message
 			{
-				From = users.FirstOrDefault(u => u.Id == messageData.From.Id),
-				To = users.FirstOrDefault(u => u.Id == messageData.To.Id),
+				From = users.FirstOrDefault(u => u.Id == messageData.FromId),
+				To = users.FirstOrDefault(u => u.Id == messageData.ToId),
 				Text = messageData.Text,
 				CreatedAt = DateTime.Now
 			};
@@ -340,8 +340,8 @@ namespace Server
                 Message message = messages[i];
                 MessageData messageData = new MessageData
                 {
-                    From = GetChatUserById(message.From.Id),
-                    To = GetChatUserById(message.To.Id),
+                    FromId = message.From.Id,
+                    ToId = message.To.Id,
                     CreatedAt = message.CreatedAt,
                     Text = message.Text
                 };

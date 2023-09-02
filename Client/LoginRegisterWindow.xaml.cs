@@ -21,7 +21,7 @@ namespace Client
     public partial class LoginRegisterWindow : Window
     {
         private ChatClient _chatClient;
-        private ChatUser Me { get; set; }
+        private ChatUser? Me { get; set; }
         public LoginRegisterWindow()
         {
             InitializeComponent();

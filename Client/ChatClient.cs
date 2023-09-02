@@ -29,46 +29,47 @@ public class ChatClient
 		_stream.Write(Encoding.UTF8.GetBytes(data), 0, data.Length);
 	}
 
-    //private string ReceiveData() //TODO не працює зчитування з буферу при перевищенні виділленого розміру
-    //{
-    //    //using (var memoryStream = new MemoryStream())
-    //    //{
-    //    //    var buffer = new byte[1024];
-    //    //    int bytesRead = 0;
-
-    //    //    do
-    //    //    {
-    //    //        bytesRead = _stream.Read(buffer, 0, buffer.Length);
-    //    //        memoryStream.Write(buffer, 0, bytesRead);
-    //    //    } while (bytesRead > 1024);
-
-    //    //    // Перетворюємо MemoryStream у рядок
-    //    //    return Encoding.UTF8.GetString(memoryStream.ToArray());
-    //    //}
-
-
-    //    var buffer = new byte[4096];
-    //    int bytesRead = 0;
-
-    //    string strData = "";
-    //    do
-    //    {
-    //        bytesRead = _stream.Read(buffer, 0, buffer.Length);
-    //        strData += Encoding.UTF8.GetString(buffer, 0, bytesRead);
-
-    //    } while (bytesRead > 4096);
-
-    //    return strData;
-    //}
-
-
-
-    private string ReceiveData()
+    private string ReceiveData() //TODO не працює зчитування з буферу при перевищенні виділленого розміру
     {
-        var data = new byte[4096];
-        int bytesRead = _stream.Read(data, 0, data.Length);
-        return Encoding.UTF8.GetString(data, 0, bytesRead);
+        //using (var memoryStream = new MemoryStream())
+        //{
+        //    var buffer = new byte[1024];
+        //    int bytesRead = 0;
+
+        //    do
+        //    {
+        //        bytesRead = _stream.Read(buffer, 0, buffer.Length);
+        //        memoryStream.Write(buffer, 0, bytesRead);
+        //    } while (bytesRead > 1024);
+
+        //    // Перетворюємо MemoryStream у рядок
+        //    return Encoding.UTF8.GetString(memoryStream.ToArray());
+        //}
+
+
+        var buffer = new byte[1024];
+        int bytesRead = 0;
+
+        string strData = "";
+        do
+        {
+            // bytesRead = _stream.Socket.Receive(buffer);
+            bytesRead = _stream.Read(buffer, 0, buffer.Length);
+            strData += Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+        } while (bytesRead > 1023);
+
+        return strData;
     }
+
+
+
+    //private string ReceiveData()
+    //{
+    //    var data = new byte[4096];
+    //    int bytesRead = _stream.Read(data, 0, data.Length);
+    //    return Encoding.UTF8.GetString(data, 0, bytesRead);
+    //}
 
 
 
@@ -144,7 +145,7 @@ public class ChatClient
         return users;
     }
 
-    public List<MessageData>? LoadMessages(GetMessagesRequest request)
+    public List<MessageData>? GetMessagesFromServer(GetMessagesRequest request)
     {
         List<MessageData>? messages = new List<MessageData>();
         try
@@ -171,8 +172,8 @@ public class ChatClient
     public bool SendMessage(ChatUser Me, ChatUser receiver, string message)
     {
         MessageData messageData = new MessageData();
-        messageData.From = Me;
-        messageData.To = receiver;
+        messageData.FromId = Me.Id;
+        messageData.ToId = receiver.Id;
         messageData.Text = message;
 
         var requestWrapper = new DataWrapper

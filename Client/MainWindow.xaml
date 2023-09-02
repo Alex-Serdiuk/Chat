@@ -16,6 +16,7 @@
             <ColumnDefinition Width="70*"></ColumnDefinition>
             <ColumnDefinition Width="30*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
+        <Label x:Name="ClientLable" Grid.Row="0" Grid.Column="0" Margin="5"/>
         <ListBox x:Name="messageListBox"
             Grid.Row="1" Grid.Column="0"
                  >

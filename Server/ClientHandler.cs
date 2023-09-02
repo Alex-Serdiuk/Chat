@@ -42,7 +42,7 @@ namespace Server
                     {
                         bytesRead = _stream.Read(buffer, 0, buffer.Length);
                         strData += Encoding.UTF8.GetString(buffer, 0, bytesRead);
-                    } while (bytesRead > 1024);
+                    } while (bytesRead > 1023);
 
                     Console.WriteLine(strData);
 

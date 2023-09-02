@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
         Title="Chat client" Height="450" Width="800">
@@ -39,9 +40,43 @@
             
             
         </ListBox>
-        <Button x:Name="UpdateButton" Margin="2" Grid.Column="1" Grid.Row="0" Click="UpdateButton_Click" >Update Messages</Button>
+        <Button x:Name="UpdateButton" Margin="2" Grid.Column="1" Grid.Row="0" Click="UpdateButton_Click" >
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=userListBox, Path=SelectedItems.Count}" Value="1">
+                            <Setter Property="IsEnabled" Value="True"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=userListBox, Path=SelectedItems.Count}" Value="0">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=userListBox, Path=SelectedItems.Count}" Value="{x:Static sys:Int32.MaxValue}">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+            Update Messages
+        </Button>
         <TextBox x:Name="messageTextBox" Margin="5" Grid.Row="2" Grid.Column="0"></TextBox>
-        <Button x:Name="SendButton" Margin="10" Grid.Column="1" Grid.Row="2" Click="SendButton_Click" >Send</Button>
+        <Button x:Name="SendButton" Margin="10" Grid.Column="1" Grid.Row="2" Click="SendButton_Click" >
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=userListBox, Path=SelectedItems.Count}" Value="1">
+                            <Setter Property="IsEnabled" Value="True"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=userListBox, Path=SelectedItems.Count}" Value="0">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=userListBox, Path=SelectedItems.Count}" Value="{x:Static sys:Int32.MaxValue}">
+                            <Setter Property="IsEnabled" Value="False"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+
+            Send</Button>
 
         <Grid Grid.Column="1" Grid.Row="1">
             <Grid.RowDefinitions>

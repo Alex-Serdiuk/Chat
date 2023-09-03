@@ -148,8 +148,8 @@ public class ChatClient
     public bool SendMessage(ChatUser Me, ChatUser receiver, string message)
     {
         MessageData messageData = new MessageData();
-        messageData.FromId = Me.Id;
-        messageData.ToId = receiver.Id;
+        messageData.From = Me;
+        messageData.To = receiver;
         messageData.Text = message;
 
         var requestWrapper = new DataWrapper

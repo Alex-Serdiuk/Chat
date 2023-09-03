@@ -29,8 +29,12 @@ namespace Client
         public ObservableCollection<string> MessagessItems;
         // Ви можете використовувати ObservableCollection для автоматичного оновлення UI при змінах у списку користувачів
         public ObservableCollection<string> userList;
-        List<ChatUser>? users = new List<ChatUser>();
-        List<MessageData>? messages = new List<MessageData>();
+        List<ChatUser> users = new List<ChatUser>();
+        
+        
+        //List<MessageData> messages = new List<MessageData>();
+
+
 
         public MainWindow(ChatUser me, ChatClient chatClient)
         {
@@ -125,7 +129,7 @@ namespace Client
 
             foreach (MessageData message in messages)
             {
-                string formattedMessage = $"{users.FirstOrDefault(user => user.Id == message.FromId).Name} ({message.CreatedAt}): {message.Text}";
+                string formattedMessage = $"{users.FirstOrDefault(user => user.Id == message.From.Id).Name} ({message.CreatedAt}): {message.Text}";
                 MessagessItems.Add(formattedMessage);
             }
             messageListBox.ItemsSource = MessagessItems;

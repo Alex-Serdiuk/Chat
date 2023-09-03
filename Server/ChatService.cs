@@ -8,155 +8,123 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    // Клас для роботи з авторизацією та повідомленнями
-    public class ChatService
-    {
-        private ServerContext _context;
+	// Клас для роботи з авторизацією та повідомленнями
+	public class ChatService
+	{
+		private ServerContext _context;
 
-        public ChatService()
-        {
-            _context = new ServerContext();
-        }
+		public ChatService()
+		{
+			_context = new ServerContext();
+		}
 
-        public User? Authenticate(string login, string password)
-        {
-            Console.WriteLine("Try auth: {0} {1}", login, password);
-            var user = _context.Users.FirstOrDefault(u => u.Login == login && u.Password == password);
+		public User? Authenticate(string login, string password)
+		{
+			Console.WriteLine("Try auth: {0} {1}", login, password);
+			var user = _context.Users.FirstOrDefault(u => u.Login == login && u.Password == password);
 
-            return user;
-        }
+			return user;
+		}
 
-        public List<User> GetUsers()
-        {
-            return _context.Users.ToList();
-        }
+		public User? GetUser(int id) {
 
-        public void SaveMessage(Message message)
-        {
-            _context.Messages.Add(message);
-            _context.SaveChanges();
-        }
+			return _context.Users.FirstOrDefault(x => x.Id == id);
+		}
 
-        public User? GetUserById(int userId)
-        {
-            User? user = new User();
+		public List<User> GetUsers()
+		{
+			return _context.Users.ToList();
+		}
 
-            try
-            {
-                
-                    user = _context.Users.FirstOrDefault(u => u.Id == userId);
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error getting user from the database: " + ex.Message);
-            }
+		public void SaveMessage(Message message)
+		{
+			_context.Messages.Add(message);
+			_context.SaveChanges();
+		}
 
-            return user;
-        }
+		public List<Message> GetMessages(int senderId, int receiverId, int afterId)
+		{
+			return _context
+				.Messages
+				.Include(message => message.From)
+				.Include(message => message.To)
+				.Where(x => x.Id > afterId)
+				.Where(x =>
+					(x.From.Id == senderId && x.To.Id == receiverId) ||
+					(x.From.Id == receiverId && x.To.Id == senderId)
+					)
+				.OrderBy(message => message.Id)
+				.ToList();
+		}
 
-        public List<Message> GetMessages(int senderId, int receiverId)
-        {
-            
-            List<Message> messages = new List<Message>();
-            User? sender = GetUserById(senderId);
-            User? receiver = GetUserById(receiverId);
-                try
-                {
-                   
-                    messages = _context.Messages
-                            .Include(message => message.From)
-                            .Include(message => message.To)
-                            .Where(message =>
-                    (message.From.Id == senderId && message.To.Id == receiverId) ||
-                    (message.From.Id == receiverId && message.To.Id == senderId))
-                            .OrderBy(message => message.CreatedAt)
-                            .ToList();
-                    //messages = dbContext.Messages
-                    //    .Where(message =>
-                    //        (message.From == sender && message.To == receiver) ||
-                    //        (message.From == receiver && message.To == sender))
-                    //    .OrderBy(message => message.CreatedAt)
-                    //    .ToList();
-                
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error getting messages from the database: " + ex.Message);
-                }
+		public User? RegisterUser(string username, string login, string password)
+		{
+			Console.WriteLine("Try reg: {0} {1}", login, password);
 
-                return messages;
-            
-        }
+			try
+			{
 
-        public User? RegisterUser(string username, string login, string password)
-        {
-            Console.WriteLine("Try reg: {0} {1}", login, password);
-            
-            try
-            {
-                
-                    // Перевірте, чи ім'я користувача вже існує
-                    if (_context.Users.Any(u => u.Name == username))
-                    {
-                        Console.WriteLine("Username already exists.");
-                        return null;
-                    }
+				// Перевірте, чи ім'я користувача вже існує
+				if (_context.Users.Any(u => u.Name == username))
+				{
+					Console.WriteLine("Username already exists.");
+					return null;
+				}
 
-                    // Перевірте, чи логін користувача вже існує
-                    if (_context.Users.Any(u => u.Login == login))
-                    {
-                        Console.WriteLine("Login already exists.");
-                        return null;
-                    }
+				// Перевірте, чи логін користувача вже існує
+				if (_context.Users.Any(u => u.Login == login))
+				{
+					Console.WriteLine("Login already exists.");
+					return null;
+				}
 
-                    // Створіть нового користувача
-                    var newUser = new User
-                    {
-                        Name = username,
-                        Login = login,
-                        Password = password
-                    };
+				// Створіть нового користувача
+				var newUser = new User
+				{
+					Name = username,
+					Login = login,
+					Password = password
+				};
 
-                    _context.Users.Add(newUser);
-                    _context.SaveChanges();
+				_context.Users.Add(newUser);
+				_context.SaveChanges();
 
-                return newUser;
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error registering user: " + ex.Message);
-                return null;
-            }
-        }
+				return newUser;
 
-        private bool DeleteMessageById(int messageId)
-        {
-            try
-            {
-                using (var dbContext = new ServerContext())
-                {
-                    var message = dbContext.Messages.FirstOrDefault(m => m.Id == messageId);
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error registering user: " + ex.Message);
+				return null;
+			}
+		}
 
-                    if (message != null)
-                    {
-                        dbContext.Messages.Remove(message);
-                        dbContext.SaveChanges();
-                        return true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("Message not found.");
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error deleting message: " + ex.Message);
-                return false;
-            }
-        }
-    }
+		private bool DeleteMessageById(int messageId)
+		{
+			try
+			{
+				using (var dbContext = new ServerContext())
+				{
+					var message = dbContext.Messages.FirstOrDefault(m => m.Id == messageId);
+
+					if (message != null)
+					{
+						dbContext.Messages.Remove(message);
+						dbContext.SaveChanges();
+						return true;
+					}
+					else
+					{
+						Console.WriteLine("Message not found.");
+						return false;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine("Error deleting message: " + ex.Message);
+				return false;
+			}
+		}
+	}
 }

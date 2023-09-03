@@ -4,8 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Client"
+        xmlns:local2="clr-namespace:Client.Converters"
         mc:Ignorable="d"
         Title="LoginRegisterWindow" Height="320" Width="370">
+    <Window.Resources>
+        <local2:AllFilledConverter x:Key="AllFilledConverter"/>
+    </Window.Resources>
+   
     <Grid>
         <TabControl>
             <TabItem Header="Login">
@@ -23,7 +28,7 @@
                             <ColumnDefinition Width="255*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Label Content="Login" Grid.Column="0" Grid.ColumnSpan="3"/>
-                        <TextBox x:Name="loginTextBox"  Margin="5,5,5,5" Grid.Column="3"/>
+                        <TextBox x:Name="loginTextBox" TextChanged="loginTextBox_TextChanged" Margin="5,5,5,5" Grid.Column="3"/>
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
@@ -31,10 +36,34 @@
                             <ColumnDefinition Width="70*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Label Content="Password" Grid.Column="0"/>
-                        <PasswordBox x:Name="passwordBox" Grid.Column="1" Margin="5" />
+                        <PasswordBox x:Name="passwordBox" PasswordChanged="PasswordBox_PasswordChanged" Grid.Column="1" Margin="5" />
                     </Grid>
 
-                    <Button Content="Login" Click="LoginButton_Click" Grid.Row="2" Margin="5" />
+                    <!--<Button Content="Login" IsEnabled="{Binding ElementName=loginTextBox,
+                        Path=Text.Length, 
+                        Converter={StaticResource AllFilledConverter}, 
+                        Mode=OneWay}" Click="LoginButton_Click" Grid.Row="2" Margin="5" >
+                        <MultiBinding Converter="{StaticResource AllFilledConverter}">
+                            <Binding ElementName="loginTextBox" Path="Text.Length"/>
+                            <Binding ElementName="passwordBox" Path="Text.Length"/>
+                        </MultiBinding>
+                    </Button>-->
+                    <Button Content="Login" x:Name="LoginButton" Click="LoginButton_Click" IsEnabled="False" Grid.Row="2" Margin="5">
+                        <!--<Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="IsEnabled">
+                                    <Setter.Value>
+                                        --><!-- Використовуємо мультибайндинг та конвертер для керування доступністю кнопки --><!--
+                                        <MultiBinding Converter="{StaticResource AllFilledConverter}">
+                                            <Binding ElementName="textBox" />
+                                            <Binding ElementName="passwordBox" />
+                                        </MultiBinding>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>-->
+
+                    </Button>
                 </Grid>
             </TabItem>
             <TabItem Header="Register">
@@ -58,7 +87,7 @@
                             <ColumnDefinition Width="70*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Label Content="Name" Grid.Column="0"/>
-                        <TextBox x:Name="usernameTextBoxReg"  Margin="5" Grid.Column="1"/>
+                        <TextBox x:Name="usernameTextBoxReg" TextChanged="usernameTextBoxReg_TextChanged" Margin="5" Grid.Column="1"/>
                     </Grid>
                     <Grid Grid.Row="1" Grid.ColumnSpan="5">
                         <Grid.ColumnDefinitions>
@@ -66,7 +95,7 @@
                             <ColumnDefinition Width="70*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Label Content="Login" Grid.Column="0"/>
-                        <TextBox x:Name="loginTextBoxReg"  Margin="5" Grid.Column="1"/>
+                        <TextBox x:Name="loginTextBoxReg" TextChanged="loginTextBoxReg_TextChanged" Margin="5" Grid.Column="1"/>
                     </Grid>
                     <Grid Grid.Row="2" Grid.ColumnSpan="5">
                         <Grid.ColumnDefinitions>
@@ -74,10 +103,10 @@
                             <ColumnDefinition Width="70*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Label Content="Password" Grid.Column="0"/>
-                        <PasswordBox x:Name="passwordBoxReg" Grid.Column="1" Margin="5" />
+                        <PasswordBox x:Name="passwordBoxReg" PasswordChanged="passwordBoxReg_PasswordChanged" Grid.Column="1" Margin="5" />
                     </Grid>
 
-                    <Button x:Name="RegisterButton" Content="Register"  Grid.Row="3" Margin="5,5,5,5" Grid.ColumnSpan="5" Click="RegisterButton_Click"/>
+                    <Button x:Name="RegisterButton" Content="Register" IsEnabled="False" Grid.Row="3" Margin="5,5,5,5" Grid.ColumnSpan="5" Click="RegisterButton_Click"/>
                 </Grid>
             </TabItem>
         </TabControl>

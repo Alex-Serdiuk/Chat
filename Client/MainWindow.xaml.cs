@@ -32,7 +32,7 @@ namespace Client
         List<ChatUser> users = new List<ChatUser>();
         
         
-        //List<MessageData> messages = new List<MessageData>();
+        List<MessageData> messages = new List<MessageData>();
 
 
 

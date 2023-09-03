@@ -268,7 +268,7 @@ namespace Server
 			return new MessageData
 			{
 				From = FromDbUser(message.From),
-				To = FromDbUser(message.to),
+				To = FromDbUser(message.To),
 				CreatedAt = message.CreatedAt,
 				Text = message.Text
 			};

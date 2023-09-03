@@ -62,35 +62,13 @@ namespace Client
         private ChatUser? receiver { get; set; }
         
 
-   //     private void LoginButton_Click(object sender, RoutedEventArgs e)
-   //     {
-   //         var me = _chatClient.Login(loginTextBox.Text, passwordBox.Password);
-
-			//if (me is ChatUser) {
-   //             Me = me;
-			//	// Переключіться на UI чату
-			//	loginPanel.Visibility = Visibility.Collapsed;
-			//	userListBox.Visibility = Visibility.Visible;
-
-			//	// Завантажте список користувачів
-			//	LoadUserList(); //TODO refactor
-			//} else
-
-   //         {
-			//	MessageBox.Show("Authentication failed.");
-			//}
-   //     }
+   
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
             userListBox_Selected();
             bool response= _chatClient.SendMessage(Me, receiver, messageTextBox.Text);
-            // Отримайте повідомлення з текстового поля
-            
-            //// Відправте повідомлення на сервер
-            //byte[] data = Encoding.UTF8.GetBytes($"SEND|{message}");
-            ////_stream.Write(data, 0, data.Length);
-
+           
             // Очистіть поле введення повідомлення
             messageTextBox.Text = string.Empty;
 

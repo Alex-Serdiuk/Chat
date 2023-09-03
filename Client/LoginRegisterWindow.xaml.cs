@@ -1,7 +1,9 @@
-﻿using CommonLibrary;
+﻿using Client.Converters;
+using CommonLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,7 +29,34 @@ namespace Client
             InitializeComponent();
             
             _chatClient = new ChatClient("127.0.0.1", 12345);
-            
+
+            //// Створюємо і встановлюємо MultiBinding для властивості IsEnabled кнопки
+            //MultiBinding multiBinding = new MultiBinding();
+            //multiBinding.Converter = new AllFilledConverter();
+
+            //// Додаємо залежності для MultiBinding, які вказують на текст у TextBox-ах
+            //multiBinding.Bindings.Add(new Binding("Text") { Source = loginTextBox });
+            //multiBinding.Bindings.Add(new Binding("Password") { Source = passwordBox });
+           
+
+            //// Встановлюємо MultiBinding для кнопки
+            //LoginButton.SetBinding(Button.IsEnabledProperty, multiBinding);
+
+        }
+
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            UpdateButtonState();
+        }
+
+        private void UpdateButtonState()
+        {
+            string text = loginTextBox.Text;
+            string password = passwordBox.Password;
+
+            bool isButtonEnabled = !string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(password);
+
+            LoginButton.IsEnabled = isButtonEnabled;
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
@@ -68,6 +97,37 @@ namespace Client
             {
                 MessageBox.Show("Registration failed.");
             }
+        }
+
+        private void loginTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateButtonState();
+        }
+
+        private void UpdateButtonStateReg()
+        {
+            string textLogin = loginTextBoxReg.Text;
+            string textName = usernameTextBoxReg.Text;
+            string password = passwordBoxReg.Password;
+
+            bool isButtonEnabled = !string.IsNullOrEmpty(textName) && !string.IsNullOrEmpty(textLogin) && !string.IsNullOrEmpty(password);
+
+            RegisterButton.IsEnabled = isButtonEnabled;
+        }
+
+        private void usernameTextBoxReg_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateButtonStateReg();
+        }
+
+        private void passwordBoxReg_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            UpdateButtonStateReg();
+        }
+
+        private void loginTextBoxReg_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateButtonStateReg();
         }
     }
 }

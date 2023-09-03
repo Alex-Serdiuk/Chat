@@ -10,8 +10,8 @@ namespace CommonLibrary
 {
     public class MessageData
     {
-        public int FromId { get; set; }
-        public int ToId { get; set; }
+        public ChatUser From { get; set; }  
+		public ChatUser To { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? Text { get; set; }
     }

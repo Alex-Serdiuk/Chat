@@ -22,21 +22,10 @@ namespace Client_MVVM
     /// </summary>
     public partial class LoginWindow : Window
     {
-        private ChatClient _chatClient;
-        private ChatUser? Me { get; set; }
-        private LoginData? LoginMe { get; set; }
-        //public UserViewModel UserModel { get; set; }
         public LoginWindow()
         {
             InitializeComponent();
-
-            _chatClient = new ChatClient("127.0.0.1", 12345);
-
-            Me = new ChatUser {Id=0, Name="", Login = "" };
-            LoginMe = new LoginData {Login="",  Password=""};
-            //UserModel = new UserViewModel(Me);
-            //DataContext = UserModel;
-            DataContext =  new UserViewModel(Me, LoginMe);
+            DataContext = new LoginWindowViewModel(this);
         }
 
         

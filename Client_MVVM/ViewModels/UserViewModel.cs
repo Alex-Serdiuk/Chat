@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace Client_MVVM.ViewModels
 {
-    class UserViewModel : NotifyPropertyChangedBase
+    public class UserViewModel : NotifyPropertyChangedBase
     {
         
         public UserViewModel(ChatUser chatUser, LoginData loginModel) 

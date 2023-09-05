@@ -70,31 +70,6 @@ namespace Server
 						HandleGetMessages(JsonSerializer.Deserialize<GetMessagesRequest>(wrapper.Content));
 					}
 
-
-
-					// Обробка різних дій в залежності від значення action
-					//switch (wrapper.Type)
-					//{
-					//    case DataType.Login:
-					//        HandleLogin(parts);
-					//        break;
-					//    case "SEND":
-					//        HandleSendMessage(parts);
-					//        break;
-					//    case "GET_USERS":
-					//        // Реалізуйте обробку запиту на список користувачів
-					//        SendUserList();
-					//        break;
-					//    // Додаткові дії можна обробляти тут
-					//    default:
-					//        //Console.WriteLine("Unknown action: " + action);
-					//        break;
-					//}
-					//if (message == "exit")
-					//{
-					//    break;
-					//}
-
 					// Очистити буфер для наступного повідомлення
 					buffer = new byte[1024];
 				}

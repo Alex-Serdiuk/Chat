@@ -30,18 +30,7 @@ namespace Client
             
             _chatClient = new ChatClient("127.0.0.1", 12345);
 
-            //// Створюємо і встановлюємо MultiBinding для властивості IsEnabled кнопки
-            //MultiBinding multiBinding = new MultiBinding();
-            //multiBinding.Converter = new AllFilledConverter();
-
-            //// Додаємо залежності для MultiBinding, які вказують на текст у TextBox-ах
-            //multiBinding.Bindings.Add(new Binding("Text") { Source = loginTextBox });
-            //multiBinding.Bindings.Add(new Binding("Password") { Source = passwordBox });
            
-
-            //// Встановлюємо MultiBinding для кнопки
-            //LoginButton.SetBinding(Button.IsEnabledProperty, multiBinding);
-
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)

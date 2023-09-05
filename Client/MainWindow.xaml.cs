@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,9 +49,7 @@ namespace Client
             if (me is ChatUser)
             {
                 Me = me;
-                // Переключіться на UI чату
-                //loginPanel.Visibility = Visibility.Collapsed;
-                //userListBox.Visibility = Visibility.Visible;
+                
 
                 // Завантажте список користувачів
                 LoadUserList(); //TODO refactor
@@ -60,6 +59,15 @@ namespace Client
             {
                 MessageBox.Show("Authentication failed.");
             }
+
+            Task.Run(() => {
+                while (true)
+                {
+                    LoadViewMessages();
+                    Thread.Sleep(5000);
+                }
+
+            });
         }
 
         private ChatUser Me { get; set; }
@@ -94,8 +102,7 @@ namespace Client
         {
             userListBox.ItemsSource = null;
             userList.Clear();
-            //userList.Add("Everyone");
-            
+           
             // Отримайте список користувачів з сервера, наприклад, використовуючи TCP/IP
             // Ви маєте реалізувати логіку для отримання списку користувачів від сервера
             users = _chatClient.GetUsersFromServer();
@@ -143,7 +150,7 @@ namespace Client
             // Отримайте вибраний елемент зі списку користувачів
             string? selectedUserName = userListBox.SelectedItem as string;
 
-            if (!string.IsNullOrEmpty(selectedUserName) && selectedUserName != "Everyone")
+            if (!string.IsNullOrEmpty(selectedUserName))
             {
                 // Знайдіть відповідного ChatUser за ім'ям
                 receiver = users.FirstOrDefault(user => user.Name == selectedUserName);
@@ -154,10 +161,7 @@ namespace Client
                     MessageBox.Show($"User ID: {receiver.Id}\nName: {receiver.Name}\nLogin: {receiver.Login}");
                 }
             }
-            //else if (selectedUserName == "Everyone")
-            //{
-            //    receiver = null;
-            //}
+            
         }
 
         private void UpdateButton_Click(object sender, RoutedEventArgs e)

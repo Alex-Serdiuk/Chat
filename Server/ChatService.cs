@@ -57,7 +57,22 @@ namespace Server
 				.ToList();
 		}
 
-		public User? RegisterUser(string username, string login, string password)
+        public List<Message> GetMessagesFromAll(int senderId, int afterId)
+        {
+            return _context
+                .Messages
+                .Include(message => message.From)
+                .Include(message => message.To)
+                .Where(x => x.Id > afterId)
+                .Where(x =>
+                    (x.From.Id == senderId) ||
+                    (x.To.Id == senderId)
+                    )
+                .OrderBy(message => message.Id)
+                .ToList();
+        }
+
+        public User? RegisterUser(string username, string login, string password)
 		{
 			Console.WriteLine("Try reg: {0} {1}", login, password);
 

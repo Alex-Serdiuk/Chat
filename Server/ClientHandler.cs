@@ -69,9 +69,13 @@ namespace Server
 					{
 						HandleGetMessages(JsonSerializer.Deserialize<GetMessagesRequest>(wrapper.Content));
 					}
+                    else if (wrapper.Type == DataType.GetAll)
+                    {
+                        HandleGetUsersAndMessages(JsonSerializer.Deserialize<GetDataRequest>(wrapper.Content));
+                    }
 
-					// Очистити буфер для наступного повідомлення
-					buffer = new byte[1024];
+                    // Очистити буфер для наступного повідомлення
+                    buffer = new byte[1024];
 				}
 			}
 			catch (Exception ex)
@@ -86,7 +90,12 @@ namespace Server
 			}
 		}
 
-		private void HandleLogin(LoginData loginData)
+        private void HandleGetUsersAndMessages(ChatUser? chatUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void HandleLogin(LoginData loginData)
 		{
 			// Отримання даних для авторизації
 			string username = loginData.Login;
@@ -268,6 +277,34 @@ namespace Server
 			byte[] responseData = Encoding.UTF8.GetBytes(json);
 			_stream.Write(responseData, 0, responseData.Length);
 		}
-	}
+        private void HandleGetUsersAndMessages(GetDataRequest request)
+        {
+            var messages = _chatService
+                 .GetMessagesFromAll(
+                 request.From.Id,  request.AfterId == null ? 0 : (int)request.AfterId)
+                 .Select(FromDbMessage)
+                 .ToList();
+
+            List<ChatUser> users = GetUsersFromDatabase();
+
+			GetDataResponse data = new GetDataResponse();
+			data.users = users;
+			data.Messages = messages;
+
+            var wrapper = new DataWrapper
+            {
+                Type = DataType.GetUsers,
+                Content = JsonSerializer.Serialize(data)
+            };
+
+            // Відправте рядок зі списком користувачів на _stream
+            // Відправка відповіді клієнту
+
+            var json = JsonSerializer.Serialize(wrapper);
+            Console.WriteLine(json);
+            byte[] responseData = Encoding.UTF8.GetBytes(json);
+            _stream.Write(responseData, 0, responseData.Length);
+        }
+    }
 
 }

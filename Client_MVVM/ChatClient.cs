@@ -167,7 +167,35 @@ public class ChatClient
         return result.IsSaveMessage;
     }
 
-    
+    public GetDataResponse GetUsersAndMessages(ChatUser Me, int startId)
+    {
+        GetDataResponse data = new GetDataResponse();
+        try
+        {
+            GetMessagesRequest request = new GetMessagesRequest();
+            request = new GetMessagesRequest()
+            {
+                From = Me,
+                AfterId = startId
+            };
+            var requestWrapper = new DataWrapper
+            {
+                Type = DataType.GetAll,
+                Content = JsonSerializer.Serialize(request)
+            };
 
-    
+            SendData(JsonSerializer.Serialize(requestWrapper));
+            string responseData = ReceiveData();
+            var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
+            data = JsonSerializer.Deserialize<GetDataResponse>(responseWrapper.Content);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error getting users messages from server: " + ex.Message);
+        }
+
+        return data;
+    }
+
+
 }

@@ -19,6 +19,12 @@ namespace Client_MVVM.ViewModels
             LoginModel = loginModel;
         }
 
+        public UserViewModel(ChatUser chatUser)
+        {
+            Model = chatUser;
+            LoginModel = new LoginData { Login = chatUser.Login, Password = null};
+        }
+
         public ChatUser Model { get; set; }
         public LoginData LoginModel { get; set; }
 

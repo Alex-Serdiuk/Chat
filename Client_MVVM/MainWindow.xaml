@@ -16,9 +16,25 @@
             <ColumnDefinition Width="70*"></ColumnDefinition>
             <ColumnDefinition Width="30*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label Grid.Row="0" Grid.Column="0" Margin="5"/>
-        <Button Margin="10" Grid.Column="1" Grid.Row="2">Send</Button>
-        <TextBox Margin="5" Grid.Row="2" Grid.Column="0"></TextBox>
-        <ListBox Grid.Column="1" Grid.Row="1" Margin="5"/>
+        <Label Content="{Binding Path=Me.Name}" Grid.Row="0" Grid.Column="0" Margin="5"/>
+        <DataGrid 
+            ItemsSource="{Binding Path=Messages}"
+            Grid.Row="1" Grid.Column="0">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=From.Name}" Header="From"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Path=CreatedAt}" Header="Date time"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Path=Text}" Header="Text"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Command="{Binding Path=Send}" Margin="10" Grid.Column="1" Grid.Row="2">Send</Button>
+        <TextBox Text="{Binding Path=NewMessage.Text}" Margin="5" Grid.Row="2" Grid.Column="0"></TextBox>
+        <DataGrid 
+            ItemsSource="{Binding Path=Users}"
+            SelectedItem="{Binding Path=SelectedUser}"
+            SelectionMode="Single" Grid.Column="1" Grid.Row="1" Margin="5">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name"></DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Window>

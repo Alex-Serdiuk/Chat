@@ -19,21 +19,21 @@
         <Label Content="{Binding Path=Me.Name}" Grid.Row="0" Grid.Column="0" Margin="5"/>
         <DataGrid 
             ItemsSource="{Binding Path=Messages}"
-            Grid.Row="1" Grid.Column="0">
+            Grid.Row="1" Grid.Column="0" AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Path=From.Name}" Header="From"></DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Path=CreatedAt}" Header="Date time"></DataGridTextColumn>
-                <DataGridTextColumn Binding="{Binding Path=Text}" Header="Text"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Path=From.Name}" Header="From" Width="Auto"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Path=CreatedAt}" Header="Date time"  Width="Auto"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Path=Text}" Header="Text" Width="1*"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
         <Button Command="{Binding Path=Send}" Margin="10" Grid.Column="1" Grid.Row="2">Send</Button>
         <TextBox Text="{Binding Path=NewMessage.Text}" Margin="5" Grid.Row="2" Grid.Column="0"></TextBox>
         <DataGrid 
             ItemsSource="{Binding Path=Users}"
-            SelectedItem="{Binding Path=SelectedUser}"
-            SelectionMode="Single" Grid.Column="1" Grid.Row="1" Margin="5">
+            SelectedItem="{Binding Path=SelectedUser, Mode=TwoWay}"
+            SelectionMode="Single" Grid.Column="1" Grid.Row="1" Margin="5" AutoGenerateColumns="False" GridLinesVisibility="None">
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name"></DataGridTextColumn>
+                <DataGridTextColumn Binding="{Binding Path=Name}" Header="Name" Width="1*"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

@@ -18,8 +18,8 @@ namespace Client_MVVM.ViewModels
         private ChatUser? receiver { get; set; }
         internal ChatClient _chatClient;
 
-        //List<ChatUser> _users = new List<ChatUser>();
-        //List<MessageData> _messages = new List<MessageData>();
+        List<ChatUser> _users = new List<ChatUser>();
+        List<MessageData> _messages = new List<MessageData>();
         public GetDataResponse data;
 
         public MainWindowViewModel(ChatUser me, ChatClient chatClient)
@@ -35,7 +35,8 @@ namespace Client_MVVM.ViewModels
             Task.Run(() => {
                 while (true)
                 {
-                    UpdateUsersAndMessages(0);
+                    UpdateUsers(0);
+                    //UpdateUsersAndMessages(0);
                     Thread.Sleep(10000);
                 }
 
@@ -47,7 +48,9 @@ namespace Client_MVVM.ViewModels
             get
             {
                 var collection = new ObservableCollection<MessageViewModel>();
-                data.Messages.ForEach(m => collection.Add(new MessageViewModel(m)));
+                if(SelectedUser!=null)
+                    _messages=SelectedUser.Model.Messages;
+                _messages.ForEach(m => collection.Add(new MessageViewModel(m)));
                 return collection;
             }
         }
@@ -56,7 +59,7 @@ namespace Client_MVVM.ViewModels
             get
             {
                 var collection = new ObservableCollection<UserViewModel>();
-                data.users.ForEach(u => collection.Add(new UserViewModel(u)));
+                _users.ForEach(u => collection.Add(new UserViewModel(u)));
                 return collection;
             }
         }
@@ -70,6 +73,7 @@ namespace Client_MVVM.ViewModels
             {
                 _selectedUser = value;
                 OnPropertyChanged(nameof(SelectedUser));
+                OnPropertyChanged(nameof(Messages));
             }
         }
 
@@ -83,12 +87,23 @@ namespace Client_MVVM.ViewModels
             OnPropertyChanged(nameof(Users));
         }
 
+        private void UpdateUsers(int startId)
+        {
+
+            _users = _chatClient.GetUsersFromServer(Me, startId);
+            
+            OnPropertyChanged(nameof(Users));
+        }
+
 
         public MessageViewModel NewMessage { get; set; }
         public ICommand Send => new RelayCommand(x =>
         {
-            bool response = _chatClient.SendMessage(NewMessage.Model.From, NewMessage.Model.To, NewMessage.Model.Text);
-
+            bool response=false;
+            if (SelectedUser!=null)
+            {
+                response = _chatClient.SendMessage(NewMessage.Model.From, NewMessage.Model.To, NewMessage.Model.Text);
+            }
             if (response)
             {
                 MessageBox.Show("Message sent!");

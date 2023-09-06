@@ -42,7 +42,7 @@ namespace Server
 			_context.SaveChanges();
 		}
 
-		public List<Message> GetMessages(int senderId, int receiverId, int afterId)
+		public List<Message> GetMessages(int senderId, int receiverId, int? afterId)
 		{
 			return _context
 				.Messages

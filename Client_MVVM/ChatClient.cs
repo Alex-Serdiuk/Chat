@@ -94,20 +94,28 @@ public class ChatClient
         return result.User;
     }
 
-    public List<ChatUser>? GetUsersFromServer()
+    public List<ChatUser>? GetUsersFromServer(ChatUser Me, int startId)
     {
 
         List<ChatUser>? users = new List<ChatUser>();
+        GetDataResponse data = new GetDataResponse();
         try
         {
 
-            var requestWrapper = new DataWrapper
-            {
-                Type = DataType.GetUsers,
-                Content = ""
-            };
+            
+                GetMessagesRequest request = new GetMessagesRequest();
+                request = new GetMessagesRequest()
+                {
+                    From = Me,
+                    AfterId = startId
+                };
+                var requestWrapper = new DataWrapper
+                {
+                    Type = DataType.GetUsers,
+                    Content = JsonSerializer.Serialize(request)
+                };
 
-            SendData(JsonSerializer.Serialize(requestWrapper));
+                SendData(JsonSerializer.Serialize(requestWrapper));
             string responseData = ReceiveData();
 
             var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);

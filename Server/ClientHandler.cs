@@ -58,7 +58,7 @@ namespace Server
 					}
 					else if (wrapper.Type == DataType.GetUsers)
 					{
-						SendUserList();
+						SendUserList(JsonSerializer.Deserialize<GetDataRequest>(wrapper.Content));
 
 					}
 					else if (wrapper.Type == DataType.SendMessage)
@@ -198,17 +198,28 @@ namespace Server
 			_stream.Write(responseData, 0, responseData.Length);
 		}
 
-		private List<ChatUser> GetUsersFromDatabase()
+		private List<ChatUser> GetUsersFromDatabase(GetDataRequest request)
 		{
-			return _chatService
-				.GetUsers()
-				.Select(user => new ChatUser
-				{
-					Id = user.Id,
-					Name = user.Name,
-					Login = user.Login
-				})
-				.ToList();
+            List<ChatUser> users = _chatService
+                .GetUsers()
+                .Select(user => new ChatUser
+                {
+                    Id = user.Id,
+                    Name = user.Name,
+                    Login = user.Login
+                })
+                .ToList();
+
+            foreach (var item in users)
+            {
+				item.Messages = _chatService
+                .GetMessages(
+                request.From.Id, item.Id, request.AfterId == null ? 0 : (int)request.AfterId)
+                .Select(FromDbMessage)
+                .ToList();
+            }
+
+            return users;
 		}
 
 		private ChatUser GetChatUserById(int id)
@@ -216,11 +227,11 @@ namespace Server
 			return FromDbUser(_chatService.GetUser(id));
 		}
 
-		private void SendUserList()
+		private void SendUserList(GetDataRequest request)
 		{
 			// Реалізуйте логіку відправки списку користувачів на _stream
 			// Отримайте список користувачів з бази даних або деінде
-			List<ChatUser> users = GetUsersFromDatabase();
+			List<ChatUser> users = GetUsersFromDatabase(request);
 
 			var wrapper = new DataWrapper
 			{
@@ -285,7 +296,7 @@ namespace Server
                  .Select(FromDbMessage)
                  .ToList();
 
-            List<ChatUser> users = GetUsersFromDatabase();
+            List<ChatUser> users = GetUsersFromDatabase(request);
 
 			GetDataResponse data = new GetDataResponse();
 			data.users = users;

@@ -2,7 +2,10 @@
 using CommonLibrary;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,28 +23,22 @@ namespace Client
     /// <summary>
     /// Interaction logic for LoginRegisterWindow.xaml
     /// </summary>
-    public partial class LoginRegisterWindow : Window
+    public partial class LoginRegisterWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void OnPropertyChanged([CallerMemberName] string prop = "")
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+        }
+        public ObservableCollection<ChatUserVM> Users { get; set; }
         private ChatClient _chatClient;
         private ChatUser? Me { get; set; }
         public LoginRegisterWindow()
         {
             InitializeComponent();
-            
+            DataContext = this;
             _chatClient = new ChatClient("127.0.0.1", 12345);
-
-            //// Створюємо і встановлюємо MultiBinding для властивості IsEnabled кнопки
-            //MultiBinding multiBinding = new MultiBinding();
-            //multiBinding.Converter = new AllFilledConverter();
-
-            //// Додаємо залежності для MultiBinding, які вказують на текст у TextBox-ах
-            //multiBinding.Bindings.Add(new Binding("Text") { Source = loginTextBox });
-            //multiBinding.Bindings.Add(new Binding("Password") { Source = passwordBox });
-           
-
-            //// Встановлюємо MultiBinding для кнопки
-            //LoginButton.SetBinding(Button.IsEnabledProperty, multiBinding);
-
         }
 
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
@@ -53,23 +50,19 @@ namespace Client
         {
             string text = loginTextBox.Text;
             string password = passwordBox.Password;
-
             bool isButtonEnabled = !string.IsNullOrEmpty(text) && !string.IsNullOrEmpty(password);
-
             LoginButton.IsEnabled = isButtonEnabled;
         }
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
             var me = _chatClient.Login(loginTextBox.Text, passwordBox.Password);
-
             if (me is ChatUser)
             {
                 Me = me;
-
-                // Створити та показати головне вікно чату
+                Users = _chatClient.GetUsersFromServer();
                 MainWindow chatWindow = new MainWindow(Me, _chatClient);
-                // Закрити вікно авторизації
+                chatWindow.Users = Users;
                 this.Close();
                 chatWindow.Show();
             }
@@ -82,14 +75,12 @@ namespace Client
         private void RegisterButton_Click(object sender, RoutedEventArgs e)
         {
             var me = _chatClient.Register(usernameTextBoxReg.Text, loginTextBoxReg.Text, passwordBoxReg.Password);
-
             if (me is ChatUser)
             {
                 Me = me;
-
-                // Створити та показати головне вікно чату
+                Users = _chatClient.GetUsersFromServer();
                 MainWindow chatWindow = new MainWindow(Me, _chatClient);
-                // Закрити вікно реєстрації
+                chatWindow.Users = Users;
                 this.Close();
                 chatWindow.Show();
             }

@@ -1,6 +1,7 @@
 ﻿using CommonLibrary;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
@@ -23,12 +25,10 @@ public class ChatClient
 		_client = new TcpClient(ip, port);
 		_stream = _client.GetStream();
 	}
-
 	private void SendData(string data)
 	{
 		_stream.Write(Encoding.UTF8.GetBytes(data), 0, data.Length);
 	}
-
     private string ReceiveData()
     {
         var buffer = new byte[1024];
@@ -45,10 +45,6 @@ public class ChatClient
 
         return strData;
     }
-
-
-
-
     public ChatUser? Login(string login, string password)
 	{
 		var loginData = new LoginData
@@ -70,7 +66,6 @@ public class ChatClient
 		var result = JsonSerializer.Deserialize<LoginResponse>(responseWrapper.Content);
 		return result.User;
 	}
-
     public ChatUser? Register(string name, string login, string password)
     {
         var registerData = new RegisterData
@@ -93,11 +88,10 @@ public class ChatClient
         var result = JsonSerializer.Deserialize<LoginResponse>(responseWrapper.Content);
         return result.User;
     }
-
-    public List<ChatUser>? GetUsersFromServer()
+    public ObservableCollection<ChatUserVM>? GetUsersFromServer()
     {
 
-        List<ChatUser>? users = new List<ChatUser>();
+        ObservableCollection<ChatUserVM>? users = null;
         try
         {
 
@@ -111,19 +105,17 @@ public class ChatClient
             string responseData = ReceiveData();
 
             var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
-            users = JsonSerializer.Deserialize<List<ChatUser>>(responseWrapper.Content);
+            users = new(JsonSerializer.Deserialize<List<ChatUser>>(responseWrapper.Content).Select(x => new ChatUserVM { ModelChatUser = x }));
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error getting users from server: " + ex.Message);
         }
-
         return users;
     }
-
-    public List<MessageData>? GetMessagesFromServer(GetMessagesRequest request)
+    public ObservableCollection<MessageDataVM>? GetMessagesFromServer(GetMessagesRequest request)
     {
-        List<MessageData>? messages = new List<MessageData>();
+        ObservableCollection<MessageDataVM>? Messages = null;
         try
         {
             var requestWrapper = new DataWrapper
@@ -135,16 +127,14 @@ public class ChatClient
             SendData(JsonSerializer.Serialize(requestWrapper));
             string responseData = ReceiveData();
             var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
-            messages = JsonSerializer.Deserialize<List<MessageData>>(responseWrapper.Content);
+            Messages = new(JsonSerializer.Deserialize<List<MessageData>>(responseWrapper.Content).Select(x => new MessageDataVM { ModelMessageData = x }));
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error getting messages from server: " + ex.Message);
         }
-
-        return messages;
+        return Messages;
     }
-
     public bool SendMessage(ChatUser Me, ChatUser receiver, string message)
     {
         MessageData messageData = new MessageData();
@@ -165,9 +155,5 @@ public class ChatClient
         var responseWrapper = JsonSerializer.Deserialize<DataWrapper>(responseData);
         var result = JsonSerializer.Deserialize<MessageResponse>(responseWrapper.Content);
         return result.IsSaveMessage;
-    }
-
-    
-
-    
+    }    
 }

@@ -16,7 +16,7 @@
             <ColumnDefinition Width="70*"></ColumnDefinition>
             <ColumnDefinition Width="30*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label Content="{Binding Path=Me.Name}" Grid.Row="0" Grid.Column="0" Margin="5"/>
+        <Label Content="{Binding Path=NewMessage.From.Name}" Grid.Row="0" Grid.Column="0" Margin="5"/>
         <DataGrid 
             ItemsSource="{Binding Path=Messages}"
             Grid.Row="1" Grid.Column="0" AutoGenerateColumns="False">

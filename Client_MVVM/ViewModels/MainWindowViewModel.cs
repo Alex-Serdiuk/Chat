@@ -29,15 +29,19 @@ namespace Client_MVVM.ViewModels
             data = new GetDataResponse();
             data.users = new List<ChatUser>();
             data.Messages = new List<MessageData>();
-            NewMessage = new MessageViewModel(new MessageData { Text = "", From = Me, CreatedAt = DateTime.Now, To = new ChatUser { Id=0,  Name="", Login=""} });
+            _newMessage = new MessageViewModel(new MessageData { Text = "", From = Me, CreatedAt = DateTime.Now, To = new ChatUser { Id = 0, Name = "", Login = "" } });
+            NewMessage = _newMessage;
             OnPropertyChanged(nameof(NewMessage));
+            OnPropertyChanged(nameof(SelectedUser));
 
             Task.Run(() => {
                 while (true)
                 {
+                    //_tempUser = SelectedUser;
+                    //_users.Clear();
                     UpdateUsers(0);
                     //UpdateUsersAndMessages(0);
-                    Thread.Sleep(10000);
+                    Thread.Sleep(20000);
                 }
 
             });
@@ -64,16 +68,26 @@ namespace Client_MVVM.ViewModels
             }
         }
 
+        //private UserViewModel _tempUser;
         private UserViewModel _selectedUser;
+        //private UserViewModel _newUser;
 
         public UserViewModel SelectedUser
         {
             get =>_selectedUser;
             set
             {
-                _selectedUser = value;
+                    _selectedUser = value;
+                    //_newUser = Users.FirstOrDefault(u => u.Id == _tempUser.Id);
+                    //if(_newUser!=null)
+                    //{
+                    //    _selectedUser = _newUser;
+                    //}
+                
+
                 OnPropertyChanged(nameof(SelectedUser));
                 OnPropertyChanged(nameof(Messages));
+                OnPropertyChanged(nameof(NewMessage));
             }
         }
 
@@ -95,24 +109,37 @@ namespace Client_MVVM.ViewModels
             OnPropertyChanged(nameof(Users));
         }
 
+        public MessageViewModel _newMessage;
+        public MessageViewModel NewMessage 
+        {
+            get => _newMessage;
+            set
+            {
+                _newMessage = new MessageViewModel(new MessageData { Text = NewMessage.Text, From = Me, CreatedAt = DateTime.Now, To = new ChatUser { Id = (SelectedUser != null) ? SelectedUser.Id : 0, Name = (SelectedUser != null) ? SelectedUser.Name : "", Login = (SelectedUser != null) ? SelectedUser.Login : "" } }); ;
+                OnPropertyChanged(nameof(SelectedUser));
+                OnPropertyChanged(nameof(NewMessage));
+            }
+        }
 
-        public MessageViewModel NewMessage { get; set; }
         public ICommand Send => new RelayCommand(x =>
         {
             bool response=false;
             if (SelectedUser!=null)
             {
-                response = _chatClient.SendMessage(NewMessage.Model.From, NewMessage.Model.To, NewMessage.Model.Text);
+                response = _chatClient.SendMessage(NewMessage.Model.From, SelectedUser.Model, NewMessage.Text);
+            
             }
             if (response)
             {
                 MessageBox.Show("Message sent!");
+                UpdateUsers(0);
             }
             else
             {
                 MessageBox.Show("Sending failed!");
             }
-            NewMessage = new MessageViewModel(new MessageData { Text = "", From = Me, CreatedAt = DateTime.Now, To = new ChatUser {Id = 0, Name = "", Login = "" } });
+            NewMessage.Text = "";
+            
             OnPropertyChanged(nameof(NewMessage));
 
         }, x => true);

@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,15 +35,17 @@ namespace Client
         }              
         public ChatClient _chatClient;
         public int startId;
-        private ChatUserVM Me { get; set; }
-        private ChatUserVM? _receiver;
+        public Timer timer;
+
+        public ChatUserVM Me { get; set; }
+        public ChatUserVM? _receiver;
         public ChatUserVM receiver
         {
             get => _receiver;
             set
             {
                 _receiver = value;
-                UpdateMessages();                                
+                timer = new Timer(UpdateMessages, null, 0, 500);
                 OnPropertyChanged(nameof(receiver));
             }
         }
@@ -67,9 +70,8 @@ namespace Client
         {
             bool response = _chatClient.SendMessage(Me.ModelChatUser, receiver.ModelChatUser, messageTextBox.Text);   
             messageTextBox.Text = string.Empty;
-            UpdateMessages();
         }
-        private void UpdateMessages()
+        private void UpdateMessages(object obj)
         {
             startId = 0;
             GetMessagesRequest request = new GetMessagesRequest();
@@ -80,6 +82,15 @@ namespace Client
                 AfterId = startId
             };
             Messages = _chatClient.GetMessagesFromServer(request);
+            for (int i = 0; i < Messages.Count(); i++)
+            {
+                if (Messages[i].From.Name == Me.Name)
+                {
+                    Messages[i].curUser = true;                    
+                }
+                else
+                    Messages[i].curUser = false;
+            }
             OnPropertyChanged(nameof(Messages));
         }
     }

@@ -11,6 +11,15 @@ namespace CommonLibrary
     public class MessageDataVM : INotifyPropertyChanged
     {
         public MessageData ModelMessageData { get; set; }
+        public bool _curUser;
+        public bool curUser {
+            get { return _curUser; }
+            set
+            {
+                _curUser = value;
+                OnPropertyChanged(nameof(curUser));
+            }
+        }
         public ChatUser From {
             get { return ModelMessageData.From; }
             set

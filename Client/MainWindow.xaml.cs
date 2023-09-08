@@ -70,6 +70,7 @@ namespace Client
         {
             bool response = _chatClient.SendMessage(Me.ModelChatUser, receiver.ModelChatUser, messageTextBox.Text);   
             messageTextBox.Text = string.Empty;
+            //messageListBox.ScrollIntoView(messageListBox.Items[messageListBox.Items.Count - 1]);
         }
         private void UpdateMessages(object obj)
         {
@@ -82,16 +83,19 @@ namespace Client
                 AfterId = startId
             };
             Messages = _chatClient.GetMessagesFromServer(request);
-            for (int i = 0; i < Messages.Count(); i++)
+            if (Messages != null)
             {
-                if (Messages[i].From.Name == Me.Name)
+                for (int i = 0; i < Messages.Count(); i++)
                 {
-                    Messages[i].curUser = true;                    
+                    if (Messages[i].From.Name == Me.Name)
+                    {
+                        Messages[i].curUser = true;
+                    }
+                    else
+                        Messages[i].curUser = false;
                 }
-                else
-                    Messages[i].curUser = false;
             }
-            OnPropertyChanged(nameof(Messages));
+            OnPropertyChanged(nameof(Messages));            
         }
     }
 }

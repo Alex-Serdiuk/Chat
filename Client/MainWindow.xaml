@@ -6,28 +6,32 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:Client"
         mc:Ignorable="d"
-        Title="Chat client" Height="450" Width="800">
+        Title="Chat client" Height="450" Width="800">    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"></RowDefinition>
             <RowDefinition Height="7*"></RowDefinition>
-            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="3*"></ColumnDefinition>
             <ColumnDefinition Width="7*"></ColumnDefinition>
             <ColumnDefinition Width="2*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Label x:Name="ClientLable" Content="{Binding Path=Me.Name}" Grid.Row="0" Grid.Column="0" Margin="5" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" BorderThickness="1" BorderBrush="LightGray" Background="LightGreen"/>
-        <Label x:Name="reciverLable" Content="{Binding Path=receiver.Name}"  Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" BorderThickness="1" BorderBrush="LightGray" Background="LightBlue"/>
-
-        <ListBox Name="messageListBox" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" FontSize="18" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Path=Messages}">
+        <Border CornerRadius="20" MinWidth="50" Grid.Row="0" Grid.Column="0" Margin="5" BorderThickness="1" BorderBrush="Black" Background="LightGreen" HorizontalAlignment="Center" VerticalAlignment="Center"> 
+            <Label x:Name="ClientLable" Content="{Binding Path=Me.Name}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Padding="10"/>
+        </Border>
+        <Border CornerRadius="20" MinWidth="50" MinHeight="50" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" BorderThickness="1" BorderBrush="Black" Background="LightBlue" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Label x:Name="reciverLable" Content="{Binding Path=receiver.Name}"   HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="20" Padding="10"/>
+        </Border>
+        <ListBox Name="messageListBox" BorderThickness="1" BorderBrush="Black" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5" FontSize="18" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Path=Messages}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Text}" x:Name="FromTextBlock" Background="LightBlue" TextAlignment="Left" HorizontalAlignment="Left"  Margin="5"/>                    
+                    <Border CornerRadius="10" x:Name="FromTextBlock" Background="LightBlue"  HorizontalAlignment="Left"  Margin="0">
+                        <TextBlock Text="{Binding Text}" Padding="10"/>                
+                    </Border>
                     <DataTemplate.Triggers>
                         <DataTrigger Binding="{Binding curUser}" Value="True">
-                            <Setter TargetName="FromTextBlock" Property="TextAlignment" Value="Right"/>
                             <Setter TargetName="FromTextBlock" Property="HorizontalAlignment" Value="Right"/>
                             <Setter TargetName="FromTextBlock" Property="Background" Value="LightGreen"/>
                         </DataTrigger>
@@ -35,14 +39,18 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
-        <DataGrid x:Name="userListBox" IsReadOnly ="True" AutoGenerateColumns="False" HeadersVisibility="Column" Grid.Row="1" Grid.RowSpan="2" FontSize="20" Grid.Column="0" Margin="5"
-                     ItemsSource="{Binding Path=Users}" SelectedItem="{Binding Path=receiver, UpdateSourceTrigger=PropertyChanged}">           
+        <DataGrid x:Name="userListBox" GridLinesVisibility="None" IsReadOnly ="True" AutoGenerateColumns="False" HeadersVisibility="Column" BorderThickness="1" BorderBrush="Black" Grid.Row="1" Grid.RowSpan="2" FontSize="20" Grid.Column="0" Margin="5" Background="Transparent"
+                     ItemsSource="{Binding Path=Users}" SelectedItem="{Binding Path=receiver, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="LightBlue" />                    
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Users" Binding="{Binding Name}" Width="3*" FontSize="16"/>                
             </DataGrid.Columns>            
         </DataGrid>
-        <TextBox x:Name="messageTextBox" Margin="5" Grid.Row="2" Grid.Column="1"></TextBox>
-        <Button x:Name="SendButton" Content="Send" Margin="5" Grid.Column="2" Grid.Row="2" Click="SendButton_Click" Background="LightGreen" FontSize="22"/>
+        <TextBox x:Name="messageTextBox" Margin="5" Grid.Row="2" Grid.Column="1" BorderThickness="1" BorderBrush="Black"/>
+        <Button x:Name="SendButton" Content="Send" Margin="5" Grid.Column="2" Grid.Row="2" Click="SendButton_Click" Background="LightGreen" FontSize="16" BorderThickness="1" BorderBrush="Black"/>
     </Grid>
 </Window>

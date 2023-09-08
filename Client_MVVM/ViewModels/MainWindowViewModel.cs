@@ -142,6 +142,11 @@ namespace Client_MVVM.ViewModels
             
             OnPropertyChanged(nameof(NewMessage));
 
-        }, x => true);
+        }, x => {
+            if (string.IsNullOrEmpty(NewMessage.Text) ||
+                (SelectedUser==null))
+                return false;
+            return true;
+        });
     }
 }

@@ -87,7 +87,12 @@ namespace Client_MVVM.ViewModels
             {
                 MessageBox.Show("Authentication failed.");
             }
-        }, x => true);
+        }, x => {
+            if (string.IsNullOrEmpty(Login) ||
+                string.IsNullOrEmpty(Password))
+                return false;
+            return true;
+        });
 
         public ICommand RegisterCommand => new RelayCommand(x =>
         {
@@ -107,6 +112,12 @@ namespace Client_MVVM.ViewModels
             {
                 MessageBox.Show("Registration failed.");
             }
-        }, x => true);
+        }, x => {
+            if (string.IsNullOrEmpty(Name) ||
+            string.IsNullOrEmpty(Login) ||
+                string.IsNullOrEmpty(Password))
+                return false;
+            return true;
+        });
     }
 }

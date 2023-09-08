@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решен
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonLibrary", "CommonLibrary\CommonLibrary.csproj", "{9EDA65EE-402E-4BDB-B67F-C3F1AC544F46}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client_MVVM", "Client_MVVM\Client_MVVM.csproj", "{81DA0CFF-D68B-4D66-B47B-4F9BA7C6AF46}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client_MVVM", "Client_MVVM\Client_MVVM.csproj", "{81DA0CFF-D68B-4D66-B47B-4F9BA7C6AF46}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

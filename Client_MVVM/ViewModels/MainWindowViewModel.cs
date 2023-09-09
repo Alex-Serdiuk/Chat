@@ -41,7 +41,7 @@ namespace Client_MVVM.ViewModels
                     //_users.Clear();
                     UpdateUsers(0);
                     //UpdateUsersAndMessages(0);
-                    Thread.Sleep(20000);
+                    Thread.Sleep(5000);
                 }
 
             });
@@ -63,7 +63,19 @@ namespace Client_MVVM.ViewModels
             get
             {
                 var collection = new ObservableCollection<UserViewModel>();
-                _users.ForEach(u => collection.Add(new UserViewModel(u)));
+                //_users.ForEach(u => collection.Add(new UserViewModel(u)));
+                foreach (var user in _users)
+                {
+                    var userViewModel = new UserViewModel(user);
+                    collection.Add(userViewModel);
+
+                    // Если выбранный пользователь все еще существует в списке,
+                    // установите его как SelectedUser.
+                    if (SelectedUser != null && SelectedUser.Model.Id == user.Id)
+                    {
+                        SelectedUser = userViewModel;
+                    }
+                }
                 return collection;
             }
         }
@@ -131,7 +143,7 @@ namespace Client_MVVM.ViewModels
             }
             if (response)
             {
-                MessageBox.Show("Message sent!");
+                //MessageBox.Show("Message sent!");
                 UpdateUsers(0);
             }
             else
